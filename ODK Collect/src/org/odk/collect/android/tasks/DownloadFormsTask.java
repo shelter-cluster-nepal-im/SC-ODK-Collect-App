@@ -236,6 +236,7 @@ public class DownloadFormsTask extends
      */
     private void downloadFile(File f, String downloadUrl) throws Exception {
         URI uri = null;
+        downloadUrl = downloadUrl.replaceAll(":8080", "");
         try {
             URL url = new URL(downloadUrl);
             uri = url.toURI();

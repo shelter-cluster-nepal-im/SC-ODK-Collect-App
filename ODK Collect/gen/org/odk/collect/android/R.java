@@ -179,7 +179,7 @@ public final class R {
         public static final int accept_location=0x7f090000;
         public static final int access_error=0x7f0900ae;
         public static final int accuracy=0x7f090001;
-        public static final int action_settings=0x7f0900c3;
+        public static final int action_settings=0x7f0900c2;
         public static final int add_another=0x7f090002;
         public static final int add_another_repeat=0x7f090003;
         public static final int add_repeat=0x7f090004;
@@ -224,6 +224,8 @@ public final class R {
         public static final int data_saved_ok=0x7f09001f;
         public static final int default_odk_formlist=0x7f0900ac;
         public static final int default_odk_submission=0x7f0900ad;
+        /**      <string name="default_server_url">http://opendatakit.appspot.com</string> 
+         */
         public static final int default_server_url=0x7f090020;
         public static final int default_splash_path=0x7f090099;
         public static final int delete_confirm=0x7f090021;
@@ -277,7 +279,7 @@ public final class R {
         public static final int get_location=0x7f090049;
         public static final int getting_location=0x7f090046;
         public static final int go_to_location=0x7f0900a0;
-        public static final int hello_world=0x7f0900c2;
+        public static final int hello_world=0x7f0900c1;
         public static final int invalid_answer_error=0x7f09004b;
         public static final int jump_to_beginning=0x7f09004c;
         public static final int jump_to_end=0x7f09004d;
@@ -364,8 +366,7 @@ public final class R {
         public static final int splash_path=0x7f090098;
         public static final int submission_url=0x7f0900a6;
         public static final int success=0x7f0900b6;
-        public static final int title_activity_main=0x7f0900c4;
-        public static final int title_activity_main_login=0x7f0900c1;
+        public static final int title_activity_main=0x7f0900c3;
         public static final int toggle_selected=0x7f090089;
         public static final int trigger=0x7f09008a;
         public static final int upload_all_successful=0x7f09008c;
