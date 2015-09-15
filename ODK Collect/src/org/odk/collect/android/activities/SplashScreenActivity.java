@@ -1,6 +1,7 @@
 
 package org.odk.collect.android.activities;
 
+import org.odk.collect.android.MainActivity;
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.preferences.PreferencesActivity;
@@ -98,7 +99,8 @@ public class SplashScreenActivity extends Activity {
     private void endSplashScreen() {
 
         // launch new activity and close splash screen
-        startActivity(new Intent(SplashScreenActivity.this, MainMenuActivity.class));
+    	startActivity(new Intent(SplashScreenActivity.this, MainActivity.class));
+//        startActivity(new Intent(SplashScreenActivity.this, MainMenuActivity.class));
         finish();
     }
 
