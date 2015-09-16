@@ -8,12 +8,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	private EditText username;
 	private EditText password;
 	private Button login;
+	ImageButton imageButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +41,6 @@ public class MainActivity extends Activity {
 		username = (EditText) findViewById(R.id.usernameET);
 		password = (EditText) findViewById(R.id.passwordET);
 		login = (Button) findViewById(R.id.loginBtn);
-//		username = (EditText) findViewById(R.id.input_email);
-//		password = (EditText) findViewById(R.id.input_password);
-//		login = (Button) findViewById(R.id.btn_login);
+//		imageButton = (ImageButton) findViewById(R.id.loginBtn);
 	}
 }

@@ -201,6 +201,7 @@ public final class WebUtils {
 			return new DocumentFetchResult(e.getLocalizedMessage()
 			// + app.getString(R.string.while_accessing) + urlString);
 					+ ("while accessing") + urlString, 0);
+//			return new DocumentFetchResult("No network Connectivity", 0);
 		}
 
 		// set up request...
