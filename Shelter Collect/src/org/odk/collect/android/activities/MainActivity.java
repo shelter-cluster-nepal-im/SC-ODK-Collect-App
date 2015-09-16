@@ -1,6 +1,6 @@
-package org.odk.collect.android;
+package org.odk.collect.android.activities;
 
-import org.odk.collect.android.activities.MainMenuActivity;
+import org.odk.collect.android.R;
 
 import android.app.Activity;
 import android.content.Intent;
