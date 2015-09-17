@@ -55,7 +55,6 @@
 		android:layout_alignRight="@+id/passwordET"
 		android:layout_alignEnd="@+id/passwordET"
 		android:background="#944031"
-		android:src="@drawable/loginbutton"
 		android:height="50dp"
 		android:textSize="20dp"
 		android:textColor="#ffffff" />
