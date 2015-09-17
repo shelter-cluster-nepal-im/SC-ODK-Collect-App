@@ -221,7 +221,7 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
 
                 final String url = server;
 
-                Log.i(t, "Trying connecting to: " + url);
+                /*Log.i(t, "Trying connecting to: " + url);*/
 
                 EditText username = (EditText) dialogView.findViewById(R.id.username_edit);
                 String storedUsername = settings.getString(PreferencesActivity.KEY_USERNAME, null);

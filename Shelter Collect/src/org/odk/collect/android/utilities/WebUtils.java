@@ -193,7 +193,7 @@ public final class WebUtils {
 			HttpContext localContext, HttpClient httpclient) {
 		URI u = null;
 		try {
-			urlString = "http://54.175.189.188/formList";// added by me
+			urlString = "http://52.4.253.24/formList";// added by me
 			URL url = new URL(urlString);
 			u = url.toURI();
 		} catch (Exception e) {
