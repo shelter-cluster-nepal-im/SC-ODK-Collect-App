@@ -26,7 +26,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -66,7 +65,7 @@ public class InstanceProvider extends ContentProvider {
         @Override
         public void onCreate(SQLiteDatabase db) {            
            db.execSQL("CREATE TABLE " + INSTANCES_TABLE_NAME + " (" 
-               + BaseColumns._ID + " integer primary key, " 
+               + InstanceColumns._ID + " integer primary key, " 
                + InstanceColumns.DISPLAY_NAME + " text not null, "
                + InstanceColumns.SUBMISSION_URI + " text, " 
                + InstanceColumns.INSTANCE_FILE_PATH + " text not null, "
@@ -109,7 +108,7 @@ public class InstanceProvider extends ContentProvider {
 
             case INSTANCE_ID:
                 qb.setProjectionMap(sInstancesProjectionMap);
-                qb.appendWhere(BaseColumns._ID + "=" + uri.getPathSegments().get(1));
+                qb.appendWhere(InstanceColumns._ID + "=" + uri.getPathSegments().get(1));
                 break;
 
             default:
@@ -254,7 +253,7 @@ public class InstanceProvider extends ContentProvider {
                 
                 count =
                     db.delete(INSTANCES_TABLE_NAME,
-                        BaseColumns._ID + "=" + instanceId
+                        InstanceColumns._ID + "=" + instanceId
                                 + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""),
                         whereArgs);
                 break;
@@ -302,7 +301,7 @@ public class InstanceProvider extends ContentProvider {
                 }
                
                 count =
-                    db.update(INSTANCES_TABLE_NAME, values, BaseColumns._ID + "=" + instanceId
+                    db.update(INSTANCES_TABLE_NAME, values, InstanceColumns._ID + "=" + instanceId
                             + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""), whereArgs);
                 break;
 
@@ -320,7 +319,7 @@ public class InstanceProvider extends ContentProvider {
         sUriMatcher.addURI(InstanceProviderAPI.AUTHORITY, "instances/#", INSTANCE_ID);
 
         sInstancesProjectionMap = new HashMap<String, String>();
-        sInstancesProjectionMap.put(BaseColumns._ID, BaseColumns._ID);
+        sInstancesProjectionMap.put(InstanceColumns._ID, InstanceColumns._ID);
         sInstancesProjectionMap.put(InstanceColumns.DISPLAY_NAME, InstanceColumns.DISPLAY_NAME);
         sInstancesProjectionMap.put(InstanceColumns.SUBMISSION_URI, InstanceColumns.SUBMISSION_URI);
         sInstancesProjectionMap.put(InstanceColumns.INSTANCE_FILE_PATH, InstanceColumns.INSTANCE_FILE_PATH);

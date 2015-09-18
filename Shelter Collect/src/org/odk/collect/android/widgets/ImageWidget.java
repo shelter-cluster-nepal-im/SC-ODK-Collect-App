@@ -28,7 +28,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.provider.BaseColumns;
+import android.provider.MediaStore.Images;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -194,7 +194,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
         // android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI only on
         // android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI + a #
         String[] projection = {
-            BaseColumns._ID
+            Images.ImageColumns._ID
         };
         Cursor c =
             getContext().getContentResolver().query(
@@ -203,7 +203,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
         int del = 0;
         if (c.getCount() > 0) {
             c.moveToFirst();
-            String id = c.getString(c.getColumnIndex(BaseColumns._ID));
+            String id = c.getString(c.getColumnIndex(Images.ImageColumns._ID));
 
             Log.i(
                 t,

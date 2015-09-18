@@ -138,8 +138,8 @@ public class LabelWidget extends QuestionWidget {
                 LinearLayout answer = new LinearLayout(getContext());
                 answer.setOrientation(LinearLayout.VERTICAL);
                 LinearLayout.LayoutParams params =
-                    new LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
-                            android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+                    new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
+                            LayoutParams.WRAP_CONTENT);
                 params.gravity = Gravity.TOP;
                 answer.setLayoutParams(params);
 
@@ -154,8 +154,8 @@ public class LabelWidget extends QuestionWidget {
 
                 // Each button gets equal weight
                 LinearLayout.LayoutParams answerParams =
-                    new LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.FILL_PARENT,
-                            android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+                    new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT,
+                            LayoutParams.WRAP_CONTENT);
                 answerParams.weight = 1;
 
                 buttonLayout.addView(answer, answerParams);
@@ -172,7 +172,7 @@ public class LabelWidget extends QuestionWidget {
 
         // The buttons take up the right half of the screen
         LinearLayout.LayoutParams buttonParams =
-            new LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.FILL_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+            new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
         buttonParams.weight = 1;
 
         questionLayout.addView(buttonLayout, buttonParams);
@@ -204,8 +204,7 @@ public class LabelWidget extends QuestionWidget {
 
     // Override QuestionWidget's add question text. Build it the same
     // but add it to the relative layout
-    @Override
-	protected void addQuestionText(FormEntryPrompt p) {
+    protected void addQuestionText(FormEntryPrompt p) {
 
         // Add the text view. Textview always exists, regardless of whether there's text.
         mQuestionText = new TextView(getContext());
@@ -224,7 +223,7 @@ public class LabelWidget extends QuestionWidget {
 
         // Put the question text on the left half of the screen
         LinearLayout.LayoutParams labelParams =
-            new LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.FILL_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+            new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
         labelParams.weight = 1;
 
         questionLayout = new LinearLayout(getContext());

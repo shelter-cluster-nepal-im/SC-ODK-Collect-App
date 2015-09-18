@@ -24,7 +24,6 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.provider.BaseColumns;
 import android.util.Log;
 
 import java.io.File;
@@ -75,7 +74,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
                     if (!FileUtils.getMd5Hash(sqlFile).contentEquals(md5)) {
                         // Probably someone overwrite the file on the sdcard
                         // So re-parse it and update it's information
-                        String id = mCursor.getString(mCursor.getColumnIndex(BaseColumns._ID));
+                        String id = mCursor.getString(mCursor.getColumnIndex(FormsColumns._ID));
                         Uri updateUri = Uri.withAppendedPath(FormsColumns.CONTENT_URI, id);
                         ContentValues updateValues = new ContentValues();
 

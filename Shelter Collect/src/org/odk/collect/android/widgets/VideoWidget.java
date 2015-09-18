@@ -27,7 +27,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.provider.MediaStore.MediaColumns;
 import android.provider.MediaStore.Video;
 import android.util.Log;
 import android.util.TypedValue;
@@ -180,11 +179,11 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
 
     private String getPathFromUri(Uri uri) {
         String[] videoProjection = {
-            MediaColumns.DATA
+            Video.Media.DATA
         };
         Cursor c = ((Activity) getContext()).managedQuery(uri, videoProjection, null, null, null);
         ((Activity) getContext()).startManagingCursor(c);
-        int column_index = c.getColumnIndexOrThrow(MediaColumns.DATA);
+        int column_index = c.getColumnIndexOrThrow(Video.Media.DATA);
         String videoPath = null;
         if (c.getCount() > 0) {
             c.moveToFirst();
@@ -213,10 +212,10 @@ public class VideoWidget extends QuestionWidget implements IBinaryWidget {
         if (newVideo.exists()) {
             // Add the copy to the content provier
             ContentValues values = new ContentValues(6);
-            values.put(MediaColumns.TITLE, newVideo.getName());
-            values.put(MediaColumns.DISPLAY_NAME, newVideo.getName());
-            values.put(MediaColumns.DATE_ADDED, System.currentTimeMillis());
-            values.put(MediaColumns.DATA, newVideo.getAbsolutePath());
+            values.put(Video.Media.TITLE, newVideo.getName());
+            values.put(Video.Media.DISPLAY_NAME, newVideo.getName());
+            values.put(Video.Media.DATE_ADDED, System.currentTimeMillis());
+            values.put(Video.Media.DATA, newVideo.getAbsolutePath());
 
             Uri VideoURI =
                 getContext().getContentResolver().insert(Video.Media.EXTERNAL_CONTENT_URI, values);

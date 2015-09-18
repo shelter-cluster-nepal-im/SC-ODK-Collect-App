@@ -42,8 +42,7 @@ public class TriggerWidget extends QuestionWidget {
     private FormEntryPrompt mPrompt;
 
 
-    @Override
-	public FormEntryPrompt getPrompt() {
+    public FormEntryPrompt getPrompt() {
         return mPrompt;
     }
 

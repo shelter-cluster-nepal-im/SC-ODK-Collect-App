@@ -18,7 +18,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.protocol.HttpContext;
 import org.javarosa.xform.parse.XFormParser;
 import org.kxml2.kdom.Element;
-import org.kxml2.kdom.Node;
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.listeners.FormListDownloaderListener;
@@ -116,11 +115,11 @@ public class DownloadFormListTask extends AsyncTask<Void, String, HashMap<String
             }
             int nElements = xformsElement.getChildCount();
             for (int i = 0; i < nElements; ++i) {
-                if (xformsElement.getType(i) != Node.ELEMENT) {
+                if (xformsElement.getType(i) != Element.ELEMENT) {
                     // e.g., whitespace (text)
                     continue;
                 }
-                Element xformElement = xformsElement.getElement(i);
+                Element xformElement = (Element) xformsElement.getElement(i);
                 if (!isXformsListNamespacedElement(xformElement)) {
                     // someone else's extension?
                     continue;
@@ -141,7 +140,7 @@ public class DownloadFormListTask extends AsyncTask<Void, String, HashMap<String
                 // don't process descriptionUrl
                 int fieldCount = xformElement.getChildCount();
                 for (int j = 0; j < fieldCount; ++j) {
-                    if (xformElement.getType(j) != Node.ELEMENT) {
+                    if (xformElement.getType(j) != Element.ELEMENT) {
                         // whitespace
                         continue;
                     }
@@ -235,7 +234,7 @@ public class DownloadFormListTask extends AsyncTask<Void, String, HashMap<String
             Element formsElement = result.doc.getRootElement();
             int formsCount = formsElement.getChildCount();
             for (int i = 0; i < formsCount; ++i) {
-                if (formsElement.getType(i) != Node.ELEMENT) {
+                if (formsElement.getType(i) != Element.ELEMENT) {
                     // whitespace
                     continue;
                 }

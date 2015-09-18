@@ -34,7 +34,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
-import android.provider.MediaStore.MediaColumns;
+import android.provider.MediaStore.Images;
 import android.widget.Toast;
 
 /**
@@ -192,12 +192,12 @@ public class PreferencesActivity extends PreferenceActivity implements
                 // get gp of chosen file
                 Uri uri = intent.getData();
                 String[] projection = {
-                    MediaColumns.DATA
+                    Images.Media.DATA
                 };
 
                 Cursor c = managedQuery(uri, projection, null, null, null);
                 startManagingCursor(c);
-                int i = c.getColumnIndexOrThrow(MediaColumns.DATA);
+                int i = c.getColumnIndexOrThrow(Images.Media.DATA);
                 c.moveToFirst();
 
                 // setting image path

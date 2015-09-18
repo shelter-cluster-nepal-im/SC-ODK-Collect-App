@@ -162,8 +162,7 @@ public class AutoCompleteWidget extends QuestionWidget {
         }
 
 
-        @Override
-		public Filter getFilter() {
+        public Filter getFilter() {
             if (mFilter == null) {
                 mFilter = new ItemsFilter(mItems);
             }

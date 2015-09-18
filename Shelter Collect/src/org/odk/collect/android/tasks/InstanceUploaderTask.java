@@ -38,7 +38,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -77,11 +76,11 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, HashMap<Strin
     protected HashMap<String, String> doInBackground(Long... values) {
         mResults = new HashMap<String, String>();
 
-        String selection = BaseColumns._ID + "=?";
+        String selection = InstanceColumns._ID + "=?";
         String[] selectionArgs = new String[values.length];
         for (int i = 0; i < values.length; i++) {
             if (i != values.length - 1) {
-                selection += " or " + BaseColumns._ID + "=?";
+                selection += " or " + InstanceColumns._ID + "=?";
             }
             selectionArgs[i] = values[i].toString();
         }
@@ -104,7 +103,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, HashMap<Strin
                 }
                 publishProgress(c.getPosition() + 1, c.getCount());
                 String instance = c.getString(c.getColumnIndex(InstanceColumns.INSTANCE_FILE_PATH));
-                String id = c.getString(c.getColumnIndex(BaseColumns._ID));
+                String id = c.getString(c.getColumnIndex(InstanceColumns._ID));
                 Uri toUpdate = Uri.withAppendedPath(InstanceColumns.CONTENT_URI, id);
 
                 String urlString = c.getString(c.getColumnIndex(InstanceColumns.SUBMISSION_URI));

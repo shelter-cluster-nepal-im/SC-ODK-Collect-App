@@ -132,8 +132,7 @@ public class GridMultiWidget extends QuestionWidget {
         ImageAdapter ia = new ImageAdapter(getContext(), choices);
         gridview.setAdapter(ia);
         gridview.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
                 if (selected[position]) {
                     selected[position] = false;
@@ -252,27 +251,23 @@ public class GridMultiWidget extends QuestionWidget {
         }
 
 
-        @Override
-		public int getCount() {
+        public int getCount() {
             return choices.length;
         }
 
 
-        @Override
-		public Object getItem(int position) {
+        public Object getItem(int position) {
             return null;
         }
 
 
-        @Override
-		public long getItemId(int position) {
+        public long getItemId(int position) {
             return 0;
         }
 
 
         // create a new ImageView for each item referenced by the Adapter
-        @Override
-		public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(int position, View convertView, ViewGroup parent) {
             String imageURI = choices[position];
 
             // It is possible that an imageview already exists and has been updated

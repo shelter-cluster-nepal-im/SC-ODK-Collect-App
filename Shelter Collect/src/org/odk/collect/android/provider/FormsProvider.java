@@ -27,7 +27,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.provider.BaseColumns;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -66,7 +65,7 @@ public class FormsProvider extends ContentProvider {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE " + FORMS_TABLE_NAME + " (" + BaseColumns._ID
+            db.execSQL("CREATE TABLE " + FORMS_TABLE_NAME + " (" + FormsColumns._ID
                     + " integer primary key, " + FormsColumns.DISPLAY_NAME + " text not null, "
                     + FormsColumns.DISPLAY_SUBTEXT + " text not null, " + FormsColumns.DESCRIPTION
                     + " text, " + FormsColumns.JR_FORM_ID + " text not null, "
@@ -115,7 +114,7 @@ public class FormsProvider extends ContentProvider {
 
             case FORM_ID:
                 qb.setProjectionMap(sFormsProjectionMap);
-                qb.appendWhere(BaseColumns._ID + "=" + uri.getPathSegments().get(1));
+                qb.appendWhere(FormsColumns._ID + "=" + uri.getPathSegments().get(1));
                 break;
 
             default:
@@ -272,7 +271,7 @@ public class FormsProvider extends ContentProvider {
 
                 count =
                     db.delete(FORMS_TABLE_NAME,
-                        BaseColumns._ID + "=" + formId
+                        FormsColumns._ID + "=" + formId
                                 + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""),
                         whereArgs);
                 break;
@@ -376,7 +375,7 @@ public class FormsProvider extends ContentProvider {
                     }
 
                     count =
-                        db.update(FORMS_TABLE_NAME, values, BaseColumns._ID + "=" + formId
+                        db.update(FORMS_TABLE_NAME, values, FormsColumns._ID + "=" + formId
                                 + (!TextUtils.isEmpty(where) ? " AND (" + where + ')' : ""),
                             whereArgs);
                 } else {
@@ -399,7 +398,7 @@ public class FormsProvider extends ContentProvider {
         sUriMatcher.addURI(FormsProviderAPI.AUTHORITY, "forms/#", FORM_ID);
 
         sFormsProjectionMap = new HashMap<String, String>();
-        sFormsProjectionMap.put(BaseColumns._ID, BaseColumns._ID);
+        sFormsProjectionMap.put(FormsColumns._ID, FormsColumns._ID);
         sFormsProjectionMap.put(FormsColumns.DISPLAY_NAME, FormsColumns.DISPLAY_NAME);
         sFormsProjectionMap.put(FormsColumns.DISPLAY_SUBTEXT, FormsColumns.DISPLAY_SUBTEXT);
         sFormsProjectionMap.put(FormsColumns.DESCRIPTION, FormsColumns.DESCRIPTION);
