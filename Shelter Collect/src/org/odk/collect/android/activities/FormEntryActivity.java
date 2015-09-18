@@ -49,11 +49,8 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
-import android.provider.MediaStore.Images.ImageColumns;
-import android.provider.MediaStore.MediaColumns;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -348,11 +345,11 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 // Add the new image to the Media content provider so that the
                 // viewing is fast in Android 2.0+
                 values = new ContentValues(6);
-                values.put(MediaColumns.TITLE, nf.getName());
-                values.put(MediaColumns.DISPLAY_NAME, nf.getName());
-                values.put(ImageColumns.DATE_TAKEN, System.currentTimeMillis());
-                values.put(MediaColumns.MIME_TYPE, "image/jpeg");
-                values.put(MediaColumns.DATA, nf.getAbsolutePath());
+                values.put(Images.Media.TITLE, nf.getName());
+                values.put(Images.Media.DISPLAY_NAME, nf.getName());
+                values.put(Images.Media.DATE_TAKEN, System.currentTimeMillis());
+                values.put(Images.Media.MIME_TYPE, "image/jpeg");
+                values.put(Images.Media.DATA, nf.getAbsolutePath());
 
                 imageURI = getContentResolver().insert(Images.Media.EXTERNAL_CONTENT_URI, values);
                 Log.i(t, "Inserting image returned uri = " + imageURI.toString());
@@ -373,11 +370,11 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                 // get gp of chosen file
                 Uri selectedImage = intent.getData();
                 String[] projection = {
-                    MediaColumns.DATA
+                    Images.Media.DATA
                 };
                 Cursor cursor = managedQuery(selectedImage, projection, null, null, null);
                 startManagingCursor(cursor);
-                int column_index = cursor.getColumnIndexOrThrow(MediaColumns.DATA);
+                int column_index = cursor.getColumnIndexOrThrow(Images.Media.DATA);
                 cursor.moveToFirst();
                 String sourceImagePath = cursor.getString(column_index);
 
@@ -394,11 +391,11 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                     // Add the new image to the Media content provider so that the
                     // viewing is fast in Android 2.0+
                     values = new ContentValues(6);
-                    values.put(MediaColumns.TITLE, newImage.getName());
-                    values.put(MediaColumns.DISPLAY_NAME, newImage.getName());
-                    values.put(ImageColumns.DATE_TAKEN, System.currentTimeMillis());
-                    values.put(MediaColumns.MIME_TYPE, "image/jpeg");
-                    values.put(MediaColumns.DATA, newImage.getAbsolutePath());
+                    values.put(Images.Media.TITLE, newImage.getName());
+                    values.put(Images.Media.DISPLAY_NAME, newImage.getName());
+                    values.put(Images.Media.DATE_TAKEN, System.currentTimeMillis());
+                    values.put(Images.Media.MIME_TYPE, "image/jpeg");
+                    values.put(Images.Media.DATA, newImage.getAbsolutePath());
 
                     imageURI =
                         getContentResolver().insert(Images.Media.EXTERNAL_CONTENT_URI, values);
@@ -1098,7 +1095,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
                                                 mInstancePath.lastIndexOf("/") + 1);
                                         Log.i(t, "attempting to delete: " + instanceFolder);
                                         String where =
-                                            MediaColumns.DATA + " like '" + instanceFolder + "%'";
+                                            Images.Media.DATA + " like '" + instanceFolder + "%'";
                                         int images =
                                             getContentResolver().delete(
                                                 Images.Media.EXTERNAL_CONTENT_URI, where, null);
@@ -1533,8 +1530,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
     }
 
 
-    @Override
-	public void next() {
+    public void next() {
         if (!mBeenSwiped) {
             mBeenSwiped = true;
             showNextView();
@@ -1558,7 +1554,7 @@ public class FormEntryActivity extends Activity implements AnimationListener, Fo
             if (c.getCount() > 0) {
                 // should only be one...
                 c.moveToFirst();
-                String id = c.getString(c.getColumnIndex(BaseColumns._ID));
+                String id = c.getString(c.getColumnIndex(InstanceColumns._ID));
                 Uri instance = Uri.withAppendedPath(InstanceColumns.CONTENT_URI, id);
                 setResult(RESULT_OK, new Intent().setData(instance));
             }

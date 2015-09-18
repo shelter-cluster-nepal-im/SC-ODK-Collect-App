@@ -29,7 +29,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
@@ -130,7 +129,7 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
         startManagingCursor(c);
         Uri formUri =
             ContentUris.withAppendedId(FormsColumns.CONTENT_URI,
-                c.getLong(c.getColumnIndex(BaseColumns._ID)));
+                c.getLong(c.getColumnIndex(FormsColumns._ID)));
 
         String action = getIntent().getAction();
         if (Intent.ACTION_PICK.equals(action)) {

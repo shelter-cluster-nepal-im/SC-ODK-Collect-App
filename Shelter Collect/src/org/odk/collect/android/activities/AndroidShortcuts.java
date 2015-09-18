@@ -26,7 +26,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.provider.BaseColumns;
 
 import java.util.ArrayList;
 
@@ -76,7 +75,7 @@ public class AndroidShortcuts extends Activity {
                 names.add(formName);
                 Uri uri =
                     Uri.withAppendedPath(FormsColumns.CONTENT_URI,
-                        c.getString(c.getColumnIndex(BaseColumns._ID)));
+                        c.getString(c.getColumnIndex(FormsColumns._ID)));
                 commands.add(uri);
             }
         }
@@ -85,15 +84,13 @@ public class AndroidShortcuts extends Activity {
         mCommands = commands.toArray(new Uri[0]);
 
         builder.setItems(this.mNames, new DialogInterface.OnClickListener() {
-            @Override
-			public void onClick(DialogInterface dialog, int item) {
+            public void onClick(DialogInterface dialog, int item) {
                 returnShortcut(mNames[item], mCommands[item]);
             }
         });
 
         builder.setOnCancelListener(new OnCancelListener() {
-            @Override
-			public void onCancel(DialogInterface dialog) {
+            public void onCancel(DialogInterface dialog) {
                 AndroidShortcuts sc = AndroidShortcuts.this;
                 sc.setResult(RESULT_CANCELED);
                 sc.finish();
@@ -116,7 +113,7 @@ public class AndroidShortcuts extends Activity {
         Intent intent = new Intent();
         intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
         intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, name);
-        Parcelable iconResource = Intent.ShortcutIconResource.fromContext(this, R.drawable.logosc);
+        Parcelable iconResource = Intent.ShortcutIconResource.fromContext(this, R.drawable.notes);
         intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
 
         // Now, return the result to the launcher

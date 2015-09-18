@@ -23,12 +23,10 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -127,7 +125,7 @@ public class InstanceUploaderList extends ListActivity {
         mInstances =
             new SimpleCursorAdapter(this, R.layout.two_item_multiple_choice, c, data, view);
         setListAdapter(mInstances);
-        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         getListView().setItemsCanFocus(false);
         mUploadButton.setEnabled(!(mSelected.size() == 0));
 
@@ -197,7 +195,7 @@ public class InstanceUploaderList extends ListActivity {
 
         // get row id from db
         Cursor c = (Cursor) getListAdapter().getItem(position);
-        long k = c.getLong(c.getColumnIndex(BaseColumns._ID));
+        long k = c.getLong(c.getColumnIndex(InstanceColumns._ID));
 
         // add/remove from selected list
         if (mSelected.contains(k))

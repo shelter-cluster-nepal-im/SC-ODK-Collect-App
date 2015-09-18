@@ -42,7 +42,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -239,7 +238,7 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
 
         mFormListAdapter =
             new SimpleAdapter(this, mFormList, R.layout.two_item_multiple_choice, data, view);
-        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         getListView().setItemsCanFocus(false);
         setListAdapter(mFormListAdapter);
     }
@@ -496,8 +495,7 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
      * 
      * @param result
      */
-    @Override
-	public void formListDownloadingComplete(HashMap<String, FormDetails> result) {
+    public void formListDownloadingComplete(HashMap<String, FormDetails> result) {
         dismissDialog(PROGRESS_DIALOG);
         mDownloadFormListTask.setDownloaderListener(null);
 

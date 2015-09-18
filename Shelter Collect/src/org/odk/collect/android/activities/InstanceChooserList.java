@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -91,7 +90,7 @@ public class InstanceChooserList extends ListActivity {
         startManagingCursor(c);
         Uri instanceUri =
             ContentUris.withAppendedId(InstanceColumns.CONTENT_URI,
-                c.getLong(c.getColumnIndex(BaseColumns._ID)));
+                c.getLong(c.getColumnIndex(InstanceColumns._ID)));
 
         String action = getIntent().getAction();
         if (Intent.ACTION_PICK.equals(action)) {

@@ -31,7 +31,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -143,7 +142,7 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
         int i = 0;
         while (it.hasNext()) {
             String id = it.next();
-            selection.append(BaseColumns._ID + "=?");
+            selection.append(InstanceColumns._ID + "=?");
             selectionArgs[i++] = id;
             if (i != keys.size()) {
                 selection.append(" or ");
@@ -159,7 +158,7 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
             while (results.moveToNext()) {
                 String name =
                     results.getString(results.getColumnIndex(InstanceColumns.DISPLAY_NAME));
-                String id = results.getString(results.getColumnIndex(BaseColumns._ID));
+                String id = results.getString(results.getColumnIndex(InstanceColumns._ID));
                 message.append(name + " : " + result.get(id) + "\n\n");
             }
         } else {
@@ -221,7 +220,7 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
 
                 final String url = server;
 
-                /*Log.i(t, "Trying connecting to: " + url);*/
+                Log.i(t, "Trying connecting to: " + url);
 
                 EditText username = (EditText) dialogView.findViewById(R.id.username_edit);
                 String storedUsername = settings.getString(PreferencesActivity.KEY_USERNAME, null);

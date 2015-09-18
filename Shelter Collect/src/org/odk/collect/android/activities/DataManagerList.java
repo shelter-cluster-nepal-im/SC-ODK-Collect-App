@@ -24,11 +24,9 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
@@ -85,7 +83,7 @@ public class DataManagerList extends ListActivity {
         mInstances =
             new SimpleCursorAdapter(this, R.layout.two_item_multiple_choice, c, data, view);
         setListAdapter(mInstances);
-        getListView().setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
+        getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         getListView().setItemsCanFocus(false);
         mDeleteButton.setEnabled(!(mSelected.size() == 0));
 
@@ -168,7 +166,7 @@ public class DataManagerList extends ListActivity {
 
         // get row id from db
         Cursor c = (Cursor) getListAdapter().getItem(position);
-        long k = c.getLong(c.getColumnIndex(BaseColumns._ID));
+        long k = c.getLong(c.getColumnIndex(InstanceColumns._ID));
 
         // add/remove from selected list
         if (mSelected.contains(k))

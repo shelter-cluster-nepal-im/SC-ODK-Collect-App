@@ -15,7 +15,6 @@ public class MainActivity extends Activity {
 	private EditText username;
 	private EditText password;
 	private Button login;
-	ImageButton imageButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

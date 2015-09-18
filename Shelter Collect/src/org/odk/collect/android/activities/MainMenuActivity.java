@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 /**
  * Responsible for displaying buttons to launch the major activities. Launches some activities based
@@ -44,10 +45,10 @@ public class MainMenuActivity extends Activity {
     private static final int MENU_PREFERENCES = Menu.FIRST;
 
     // buttons
-    private Button mEnterDataButton;
-    private Button mManageFilesButton;
-    private Button mSendDataButton;
-    private Button mReviewDataButton;
+    private ImageButton mEnterDataButton;
+    private ImageButton mManageFilesButton;
+    private ImageButton mSendDataButton;
+    private ImageButton mReviewDataButton;
 
     private AlertDialog mAlertDialog;
 
@@ -73,8 +74,8 @@ public class MainMenuActivity extends Activity {
         setTitle(getString(R.string.app_name) + " > " + getString(R.string.main_menu));
 
         // enter data button. expects a result.
-        mEnterDataButton = (Button) findViewById(R.id.enter_data);
-        mEnterDataButton.setText(getString(R.string.enter_data_button));
+        mEnterDataButton = (ImageButton) findViewById(R.id.enter_data);
+        //mEnterDataButton.setText(getString(R.string.enter_data_button));
         mEnterDataButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,8 +85,8 @@ public class MainMenuActivity extends Activity {
         });
 
         // review data button. expects a result.
-        mReviewDataButton = (Button) findViewById(R.id.review_data);
-        mReviewDataButton.setText(getString(R.string.review_data_button));
+        mReviewDataButton = (ImageButton) findViewById(R.id.review_data);
+        //mReviewDataButton.setText(getString(R.string.review_data_button));
         mReviewDataButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,8 +96,8 @@ public class MainMenuActivity extends Activity {
         });
 
         // send data button. expects a result.
-        mSendDataButton = (Button) findViewById(R.id.send_data);
-        mSendDataButton.setText(getString(R.string.send_data_button));
+        mSendDataButton = (ImageButton) findViewById(R.id.send_data);
+        //mSendDataButton.setText(getString(R.string.send_data_button));
         mSendDataButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,8 +107,8 @@ public class MainMenuActivity extends Activity {
         });
 
         // manage forms button. no result expected.
-        mManageFilesButton = (Button) findViewById(R.id.manage_forms);
-        mManageFilesButton.setText(getString(R.string.manage_files));
+        mManageFilesButton = (ImageButton) findViewById(R.id.manage_forms);
+        //mManageFilesButton.setText(getString(R.string.manage_files));
         mManageFilesButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
