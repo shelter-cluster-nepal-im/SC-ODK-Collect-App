@@ -1,123 +1,158 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2009 University of Washington Licensed under the Apache 
-	License, Version 2.0 (the "License"); you may not use this file except in 
-	compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
-	Unless required by applicable law or agreed to in writing, software distributed 
-	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
-	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
-	the specific language governing permissions and limitations under the License. -->
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:id="@+id/rl"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
-  android:orientation="vertical"
-  android:padding="0dp" 
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_marginBottom="0dp"
     android:layout_marginLeft="0dp"
     android:layout_marginRight="0dp"
     android:layout_marginTop="0dp"
-    android:layout_marginBottom="0dp"
-    android:background="#f7f6f2">
+    android:background="#f7f6f2"
+    android:orientation="vertical"
+    android:padding="0dp">
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:id="@+id/imageView"
-        android:src="@drawable/shelter_collect_logo"
-        android:layout_alignParentTop="true"
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"></ScrollView>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="35dp" />
-  <!--<TextView
-    android:gravity="center"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="6dp"
-    android:paddingBottom="1dp"
-    android:textSize="21dp"
-    android:textStyle="bold"
-    android:text="@string/main_menu_message" />-->
-  
-<!--  <TextView
-    android:gravity="center"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:paddingTop="1dp"
-    android:paddingBottom="10dp"
-    android:text="@string/main_menu_details" />-->
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:weightSum="1"
+        >
+        <ImageView
+            android:layout_width="458dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:src="@drawable/shelter_collect_logo"
+            android:layout_gravity="center"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="35dp" />
 
-  <ScrollView
-    android:layout_width="fill_parent"
-    android:orientation="vertical"  
-    android:layout_height="fill_parent" >  
-  
-    <LinearLayout
-      android:layout_width="fill_parent"
-      android:layout_height="fill_parent"
-      android:orientation="vertical"  android:paddingLeft="10dp" android:paddingRight="10dp">
+        <LinearLayout
+            android:id="@+id/row1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="46dp"
+            android:layout_below="@+id/imageView"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
 
-          <TextView
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:textSize="2pt" />
-          
-          <Button
-          android:id="@+id/enter_data"
-          android:textSize="21dp"
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content" 
-          android:padding="20dp"/>
-        
-          <TextView
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:textSize="2pt" />
+            android:gravity="center_vertical">
 
-          <Button
-          android:id="@+id/review_data"
-          android:textSize="21dp"
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content" 
-          android:padding="20dp"/>
-        
-          <TextView
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:textSize="2pt" />
-          
-          <Button
-          android:id="@+id/send_data"
-          android:textSize="21dp"
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content" 
-          android:padding="20dp" />
-        
-          <TextView
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content"
-          android:textSize="2pt" />
-    
-          <Button
-          android:id="@+id/manage_forms"
-          android:textSize="21dp"
-          android:layout_width="fill_parent"
-          android:layout_height="wrap_content" 
-          android:padding="20dp" />
-       
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="50"
+                android:gravity="center_horizontal">
+
+                <ImageButton
+                    android:id="@+id/enter_data"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_alignParentTop="true"
+                    android:gravity="center_horizontal"
+                    android:src="@drawable/new_form_small"
+                    android:background="#f7f6f2"></ImageButton>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/enter_data"
+                    android:layout_marginLeft="15dp"
+                    android:clickable="false"
+                    android:gravity="center_horizontal"
+                    android:text="New Form" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="50"
+                android:gravity="center">
+
+                <ImageButton
+                    android:id="@+id/review_data"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/edit_form_small"
+                    android:background="#f7f6f2"></ImageButton>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/review_data"
+                    android:layout_marginLeft="15dp"
+                    android:clickable="false"
+                    android:text="Edit Form"
+                    />
+            </RelativeLayout>
+        </LinearLayout>
+        //row 2
+        <LinearLayout
+            android:id="@+id/row2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:gravity="center_vertical">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="50"
+                android:gravity="center_horizontal">
+
+                <ImageButton
+                    android:id="@+id/send_data"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:gravity="center_horizontal"
+                    android:src="@drawable/upload_form_small"
+                    android:background="#f7f6f2">
+                </ImageButton>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/send_data"
+                    android:layout_marginLeft="15dp"
+                    android:clickable="false"
+                    android:gravity="center_horizontal"
+                    android:text="Send Form" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="50"
+                android:gravity="center">
+
+                <ImageButton
+                    android:id="@+id/manage_forms"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/manageform"
+                    android:background="#f7f6f2">
+                </ImageButton>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/manage_forms"
+                    android:layout_marginLeft="20dp"
+                    android:clickable="false"
+                    android:text="Manage"/>
+            </RelativeLayout>
+        </LinearLayout>
     </LinearLayout>
-        
-  </ScrollView>  
-	<TextView
-		android:id="@+id/main_menu_footer"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:gravity="center"
-		android:paddingRight="8dip"
-		android:paddingLeft="8dip"
-		android:paddingTop="4dip"
-		android:paddingBottom="4dip"
-		android:text="@string/powered_by_odk"
-		android:textSize="14dip"
-		android:layout_alignParentBottom="true" />
-</LinearLayout>
+</RelativeLayout>

@@ -8,7 +8,7 @@
 		android:summary="@string/click_to_web">
 		<intent
 			android:action="android.intent.action.VIEW"
-			android:data="http://54.175.189.188" />
+			android:data="http://opendatakit.org" />
 	</PreferenceScreen>
 	<PreferenceCategory
 		android:title="@string/server_preferences">

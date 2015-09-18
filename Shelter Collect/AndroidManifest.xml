@@ -136,6 +136,10 @@
             android:name="org.odk.collect.android.activities.MainActivity"
             android:label="@string/app_name" >
         </activity>
+        <activity
+            android:name="org.odk.collect.android.activities.RequestAccess"
+            android:label="@string/app_name" >
+        </activity>
     </application>
 
     <uses-permission

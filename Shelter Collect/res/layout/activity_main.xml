@@ -24,13 +24,13 @@
 	<ImageView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:gravity="center"
+		android:layout_gravity="center"
 		android:id="@+id/imageView"
 		android:src="@drawable/shelter_collect_logo"
+		android:layout_marginTop="40dp"
 		android:layout_alignParentTop="true"
-		android:layout_alignParentLeft="true"
-		android:layout_alignParentStart="true"
-		android:layout_marginTop="35dp" />
+		android:layout_alignParentRight="true"
+		android:layout_alignParentEnd="true" />
 
 	<EditText
 		android:layout_width="match_parent"
@@ -56,6 +56,22 @@
 		android:layout_alignRight="@+id/passwordET"
 		android:layout_alignEnd="@+id/passwordET"
 		android:background="#944031"
+		android:height="50dp"
+		android:textSize="20dp"
+		android:textColor="#ffffff" />
+
+	<Button
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Request Access"
+		android:textStyle="bold"
+		android:id="@+id/subBtn"
+		android:onClick="requestAccess"
+		android:layout_marginTop="15dp"
+		android:layout_below="@+id/loginBtn"
+		android:layout_alignRight="@+id/loginBtn"
+		android:layout_alignEnd="@+id/loginBtn"
+		android:background="#b6b8b1"
 		android:height="50dp"
 		android:textSize="20dp"
 		android:textColor="#ffffff" />

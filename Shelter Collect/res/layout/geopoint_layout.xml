@@ -4,7 +4,8 @@
 	android:id="@+id/mainlayout"
 	android:orientation="vertical"
 	android:layout_width="fill_parent"
-	android:layout_height="fill_parent">
+	android:layout_height="fill_parent"
+	android:background="#f7f6f2">
 	<com.google.android.maps.MapView
 		android:id="@+id/mapview"
 		android:layout_width="fill_parent"
