@@ -21,10 +21,16 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		setupVariables();
+	}
+
+	public void requestAccess(View v){
+		Intent intent = new Intent(MainActivity.this, RequestAccess.class);
+		startActivity(intent);
+
 	}
 
 	public void authenticateLogin(View view) {
+		setupVariables();
 		if (username.getText().toString().equals("admin")
 				&& password.getText().toString().equals("admin")) {
 			Intent intent = new Intent(MainActivity.this, MainMenuActivity.class);
