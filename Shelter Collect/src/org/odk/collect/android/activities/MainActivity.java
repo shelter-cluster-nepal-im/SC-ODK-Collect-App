@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -46,6 +45,5 @@ public class MainActivity extends Activity {
 		username = (EditText) findViewById(R.id.usernameET);
 		password = (EditText) findViewById(R.id.passwordET);
 		login = (Button) findViewById(R.id.loginBtn);
-//		imageButton = (ImageButton) findViewById(R.id.loginBtn);
 	}
 }

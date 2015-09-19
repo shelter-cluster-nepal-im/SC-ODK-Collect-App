@@ -9,7 +9,7 @@
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/usernameET"
+        android:id="@+id/fullname"
         android:hint="Full Name"
         android:focusable="true"
         android:textColorHighlight="#ff7eff15"
@@ -36,17 +36,17 @@
         android:id="@+id/email"
         android:textColorHint="#cccccc"
         android:hint="Email Address"
-        android:layout_below="@+id/usernameET"
-        android:layout_alignRight="@+id/usernameET"
-        android:layout_alignEnd="@+id/usernameET" />
+        android:layout_below="@+id/fullname"
+        android:layout_alignRight="@+id/fullname"
+        android:layout_alignEnd="@+id/fullname" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Request Access "
         android:textStyle="bold"
-        android:id="@+id/loginBtn"
-        android:onClick="authenticateLogin"
+        android:id="@+id/subBtn"
+        android:onClick="processForm"
         android:background="#944031"
         android:height="50dp"
         android:textSize="20dp"

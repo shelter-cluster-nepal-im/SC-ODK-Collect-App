@@ -61,13 +61,9 @@
 	<string name="operation_prompt">Choose a country</string>
 
 	<string-array name="operation_arrays">
-		<item>Malaysia</item>
-		<item>United States</item>
-		<item>Indonesia</item>
-		<item>France</item>
-		<item>Italy</item>
-		<item>Singapore</item>
-		<item>New Zealand</item>
-		<item>India</item>
+		<item>Select One</item>
+		<item>Nepal Earthquake 2015</item>
+		<item>Myanmar Floods 2015</item>
+		<item>Vanuatu Cyclone Pam 2015</item>
 	</string-array>
 </resources>

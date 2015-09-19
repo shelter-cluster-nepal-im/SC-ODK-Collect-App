@@ -16,7 +16,7 @@
 
     <application
         android:name="org.odk.collect.android.application.Collect"
-        android:icon="@drawable/logosc"
+        android:icon="@drawable/notes"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Light" >
         <provider
