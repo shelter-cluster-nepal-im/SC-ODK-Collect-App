@@ -1,0 +1,82 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
+    android:background="#f7f6f2"
+    android:paddingBottom="16dp"
+    tools:context=".MainActivity">
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/usernameET"
+        android:hint="Enter Username"
+        android:focusable="true"
+        android:textColorHighlight="#ff7eff15"
+        android:textColorHint="#cccccc"
+        android:layout_marginTop="46dp"
+        android:layout_below="@+id/imageView"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/imageView"
+        android:src="@drawable/shelter_collect_logo"
+        android:layout_marginTop="25dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/passwordET"
+        android:textColorHint="#cccccc"
+        android:hint="Password"
+        android:layout_below="@+id/usernameET"
+        android:layout_alignRight="@+id/usernameET"
+        android:layout_alignEnd="@+id/usernameET" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Login"
+        android:textStyle="bold"
+        android:id="@+id/loginBtn"
+        android:onClick="authenticateLogin"
+        android:layout_marginTop="35dp"
+        android:layout_below="@+id/passwordET"
+        android:layout_alignRight="@+id/passwordET"
+        android:layout_alignEnd="@+id/passwordET"
+        android:background="#944031"
+        android:height="50dp"
+        android:textSize="20dp"
+        android:textColor="#ffffff" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Request Access"
+        android:textStyle="bold"
+        android:id="@+id/submitBtn"
+        android:onClick="requestAccess"
+        android:layout_marginTop="15dp"
+        android:layout_below="@+id/loginBtn"
+        android:layout_alignRight="@+id/loginBtn"
+        android:layout_alignEnd="@+id/loginBtn"
+        android:background="#b6b8b1"
+        android:height="50dp"
+        android:textSize="20dp"
+        android:textColor="#ffffff" />
+
+</RelativeLayout>
