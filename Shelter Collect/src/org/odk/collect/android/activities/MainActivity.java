@@ -79,7 +79,7 @@ public class MainActivity extends Activity {
             }
         } else {
             Toast.makeText(getApplicationContext(),
-                    "No Internet Conncetion!", Toast.LENGTH_SHORT)
+                    "No network connection!", Toast.LENGTH_SHORT)
                     .show();
         }
     }
