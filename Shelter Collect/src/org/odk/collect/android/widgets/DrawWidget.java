@@ -14,18 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import java.io.File;
-
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.R;
-import org.odk.collect.android.activities.DrawActivity;
-import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.utilities.FileUtils;
-import org.odk.collect.android.utilities.MediaUtils;
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
@@ -42,10 +30,21 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
+import org.odk.collect.android.activities.DrawActivity;
+import org.odk.collect.android.activities.FormEntryActivity;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.utilities.MediaUtils;
+
+import java.io.File;
 
 /**
  * Free drawing widget.
@@ -65,18 +64,18 @@ public class DrawWidget extends QuestionWidget implements IBinaryWidget {
         super(context, prompt);
 
         mErrorTextView = new TextView(context);
-        mErrorTextView.setId(QuestionWidget.newUniqueId());
+        mErrorTextView.setId(newUniqueId());
         mErrorTextView.setText("Selected file is not a valid image");
 
         mInstanceFolder = Collect.getInstance().getFormController()
                 .getInstancePath().getParent();
 
-        setOrientation(LinearLayout.VERTICAL);
+        setOrientation(VERTICAL);
         TableLayout.LayoutParams params = new TableLayout.LayoutParams();
         params.setMargins(7, 5, 7, 5);
         // setup Blank Image Button
         mDrawButton = new Button(getContext());
-        mDrawButton.setId(QuestionWidget.newUniqueId());
+        mDrawButton.setId(newUniqueId());
         mDrawButton.setText(getContext().getString(R.string.draw_image));
         mDrawButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mDrawButton.setPadding(20, 20, 20, 20);
@@ -99,9 +98,9 @@ public class DrawWidget extends QuestionWidget implements IBinaryWidget {
         addView(mErrorTextView);
 
         if (mPrompt.isReadOnly()) {
-            mDrawButton.setVisibility(View.GONE);
+            mDrawButton.setVisibility(GONE);
         }
-        mErrorTextView.setVisibility(View.GONE);
+        mErrorTextView.setVisibility(GONE);
 
         // retrieve answer from data model and update ui
         mBinaryName = prompt.getAnswerText();
@@ -109,7 +108,7 @@ public class DrawWidget extends QuestionWidget implements IBinaryWidget {
         // Only add the imageView if the user has signed
         if (mBinaryName != null) {
             mImageView = new ImageView(getContext());
-            mImageView.setId(QuestionWidget.newUniqueId());
+            mImageView.setId(newUniqueId());
             Display display = ((WindowManager) getContext().getSystemService(
                     Context.WINDOW_SERVICE)).getDefaultDisplay();
             int screenWidth = display.getWidth();
@@ -121,7 +120,7 @@ public class DrawWidget extends QuestionWidget implements IBinaryWidget {
                 Bitmap bmp = FileUtils.getBitmapScaledToDisplay(f,
                         screenHeight, screenWidth);
                 if (bmp == null) {
-                    mErrorTextView.setVisibility(View.VISIBLE);
+                    mErrorTextView.setVisibility(VISIBLE);
                 }
                 mImageView.setImageBitmap(bmp);
             } else {
@@ -147,7 +146,7 @@ public class DrawWidget extends QuestionWidget implements IBinaryWidget {
     }
 
     private void launchDrawActivity() {
-        mErrorTextView.setVisibility(View.GONE);
+        mErrorTextView.setVisibility(GONE);
         Intent i = new Intent(getContext(), DrawActivity.class);
         i.putExtra(DrawActivity.OPTION, DrawActivity.OPTION_DRAW);
         // copy...
@@ -189,7 +188,7 @@ public class DrawWidget extends QuestionWidget implements IBinaryWidget {
         // remove the file
         deleteMedia();
         mImageView.setImageBitmap(null);
-        mErrorTextView.setVisibility(View.GONE);
+        mErrorTextView.setVisibility(GONE);
 
         // reset buttons
         mDrawButton.setText(getContext().getString(R.string.draw_image));

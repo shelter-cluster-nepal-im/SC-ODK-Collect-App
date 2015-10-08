@@ -14,25 +14,25 @@
 
 package org.odk.collect.android.tasks;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.DiskSyncListener;
-import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
-import org.odk.collect.android.utilities.FileUtils;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.DiskSyncListener;
+import org.odk.collect.android.provider.FormsProviderAPI;
+import org.odk.collect.android.utilities.FileUtils;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Background task for adding to the forms content provider, any forms that have been added to the
@@ -50,16 +50,6 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
     DiskSyncListener mListener;
 
     String statusMessage;
-
-    private static class UriFile {
-        public final Uri uri;
-        public final File file;
-
-        UriFile(Uri uri, File file) {
-            this.uri = uri;
-            this.file = file;
-        }
-    }
 
     @Override
     protected String doInBackground(Void... params) {
@@ -100,7 +90,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
                 // open the cursor within a try-catch block so it can always be closed.
                 try {
                     mCursor = Collect.getInstance().getContentResolver()
-                            .query(FormsColumns.CONTENT_URI, null, null, null, null);
+                            .query(FormsProviderAPI.FormsColumns.CONTENT_URI, null, null, null, null);
                     if (mCursor == null) {
                         Log.e(t, "[" + instance + "] Forms Content Provider returned NULL");
                         errors.append("Internal Error: Unable to access Forms content provider").append("\r\n");
@@ -112,8 +102,8 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
                     while (mCursor.moveToNext()) {
                         // For each element in the provider, see if the file already exists
                         String sqlFilename =
-                                mCursor.getString(mCursor.getColumnIndex(FormsColumns.FORM_FILE_PATH));
-                        String md5 = mCursor.getString(mCursor.getColumnIndex(FormsColumns.MD5_HASH));
+                                mCursor.getString(mCursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_FILE_PATH));
+                        String md5 = mCursor.getString(mCursor.getColumnIndex(FormsProviderAPI.FormsColumns.MD5_HASH));
                         File sqlFile = new File(sqlFilename);
                         if (sqlFile.exists()) {
                             // remove it from the list of forms (we only want forms
@@ -122,8 +112,8 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
                             if (!FileUtils.getMd5Hash(sqlFile).contentEquals(md5)) {
                                 // Probably someone overwrite the file on the sdcard
                                 // So re-parse it and update it's information
-                                String id = mCursor.getString(mCursor.getColumnIndex(FormsColumns._ID));
-                                Uri updateUri = Uri.withAppendedPath(FormsColumns.CONTENT_URI, id);
+                                String id = mCursor.getString(mCursor.getColumnIndex(FormsProviderAPI.FormsColumns._ID));
+                                Uri updateUri = Uri.withAppendedPath(FormsProviderAPI.FormsColumns.CONTENT_URI, id);
                                 uriToUpdate.add(new UriFile(updateUri, sqlFile));
                             }
                         } else {
@@ -197,7 +187,7 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
                         // insert failures are OK and expected if multiple
                         // DiskSync scanners are active.
                         Collect.getInstance().getContentResolver()
-                                .insert(FormsColumns.CONTENT_URI, values);
+                                .insert(FormsProviderAPI.FormsColumns.CONTENT_URI, values);
                     } catch (SQLException e) {
                         Log.i(t, "[" + instance + "] " + e.toString());
                     }
@@ -217,14 +207,14 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
     private boolean isAlreadyDefined(File formDefFile) {
         // first try to see if a record with this filename already exists...
         String[] projection = {
-                FormsColumns._ID, FormsColumns.FORM_FILE_PATH
+                FormsProviderAPI.FormsColumns._ID, FormsProviderAPI.FormsColumns.FORM_FILE_PATH
         };
         String[] selectionArgs = {formDefFile.getAbsolutePath()};
-        String selection = FormsColumns.FORM_FILE_PATH + "=?";
+        String selection = FormsProviderAPI.FormsColumns.FORM_FILE_PATH + "=?";
         Cursor c = null;
         try {
             c = Collect.getInstance().getContentResolver()
-                    .query(FormsColumns.CONTENT_URI, projection, selection, selectionArgs, null);
+                    .query(FormsProviderAPI.FormsColumns.CONTENT_URI, projection, selection, selectionArgs, null);
             return (c.getCount() > 0);
         } finally {
             if (c != null) {
@@ -265,32 +255,32 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
 
         // update date
         Long now = Long.valueOf(System.currentTimeMillis());
-        updateValues.put(FormsColumns.DATE, now);
+        updateValues.put(FormsProviderAPI.FormsColumns.DATE, now);
 
         if (title != null) {
-            updateValues.put(FormsColumns.DISPLAY_NAME, title);
+            updateValues.put(FormsProviderAPI.FormsColumns.DISPLAY_NAME, title);
         } else {
             throw new IllegalArgumentException(Collect.getInstance().getString(R.string.xform_parse_error,
                     formDefFile.getName(), "title"));
         }
         if (formid != null) {
-            updateValues.put(FormsColumns.JR_FORM_ID, formid);
+            updateValues.put(FormsProviderAPI.FormsColumns.JR_FORM_ID, formid);
         } else {
             throw new IllegalArgumentException(Collect.getInstance().getString(R.string.xform_parse_error,
                     formDefFile.getName(), "id"));
         }
         if (version != null) {
-            updateValues.put(FormsColumns.JR_VERSION, version);
+            updateValues.put(FormsProviderAPI.FormsColumns.JR_VERSION, version);
         }
         if (submission != null) {
-            updateValues.put(FormsColumns.SUBMISSION_URI, submission);
+            updateValues.put(FormsProviderAPI.FormsColumns.SUBMISSION_URI, submission);
         }
         if (base64RsaPublicKey != null) {
-            updateValues.put(FormsColumns.BASE64_RSA_PUBLIC_KEY, base64RsaPublicKey);
+            updateValues.put(FormsProviderAPI.FormsColumns.BASE64_RSA_PUBLIC_KEY, base64RsaPublicKey);
         }
         // Note, the path doesn't change here, but it needs to be included so the
         // update will automatically update the .md5 and the cache path.
-        updateValues.put(FormsColumns.FORM_FILE_PATH, formDefFile.getAbsolutePath());
+        updateValues.put(FormsProviderAPI.FormsColumns.FORM_FILE_PATH, formDefFile.getAbsolutePath());
 
         return updateValues;
     }
@@ -299,12 +289,21 @@ public class DiskSyncTask extends AsyncTask<Void, String, String> {
         mListener = l;
     }
 
-
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
         if (mListener != null) {
             mListener.SyncComplete(result);
+        }
+    }
+
+    private static class UriFile {
+        public final Uri uri;
+        public final File file;
+
+        UriFile(Uri uri, File file) {
+            this.uri = uri;
+            this.file = file;
         }
     }
 

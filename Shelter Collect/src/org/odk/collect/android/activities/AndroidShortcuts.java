@@ -14,11 +14,6 @@
 
 package org.odk.collect.android.activities;
 
-import java.util.ArrayList;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -28,6 +23,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.provider.FormsProviderAPI;
+
+import java.util.ArrayList;
 
 /**
  * Allows the user to create desktop shortcuts to any form currently avaiable to Collect
@@ -67,16 +67,16 @@ public class AndroidShortcuts extends Activity {
 
         Cursor c = null;
         try {
-            c = getContentResolver().query(FormsColumns.CONTENT_URI, null, null, null, null);
+            c = getContentResolver().query(FormsProviderAPI.FormsColumns.CONTENT_URI, null, null, null, null);
 
             if (c.getCount() > 0) {
                 c.moveToPosition(-1);
                 while (c.moveToNext()) {
-                    String formName = c.getString(c.getColumnIndex(FormsColumns.DISPLAY_NAME));
+                    String formName = c.getString(c.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
                     names.add(formName);
                     Uri uri =
-                            Uri.withAppendedPath(FormsColumns.CONTENT_URI,
-                                    c.getString(c.getColumnIndex(FormsColumns._ID)));
+                            Uri.withAppendedPath(FormsProviderAPI.FormsColumns.CONTENT_URI,
+                                    c.getString(c.getColumnIndex(FormsProviderAPI.FormsColumns._ID)));
                     commands.add(uri);
                 }
             }

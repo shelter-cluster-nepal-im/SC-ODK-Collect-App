@@ -14,8 +14,6 @@
 
 package org.odk.collect.android.database;
 
-import java.io.File;
-
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteException;
@@ -24,6 +22,8 @@ import android.util.Log;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
+
+import java.io.File;
 
 
 /**

@@ -14,6 +14,36 @@
 
 package org.odk.collect.android.tasks;
 
+import android.content.ContentValues;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.webkit.MimeTypeMap;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.InstanceUploaderListener;
+import org.odk.collect.android.logic.PropertyManager;
+import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.collect.android.utilities.WebUtils;
+import org.opendatakit.httpclientandroidlib.Header;
+import org.opendatakit.httpclientandroidlib.HttpResponse;
+import org.opendatakit.httpclientandroidlib.HttpStatus;
+import org.opendatakit.httpclientandroidlib.client.ClientProtocolException;
+import org.opendatakit.httpclientandroidlib.client.HttpClient;
+import org.opendatakit.httpclientandroidlib.client.methods.HttpHead;
+import org.opendatakit.httpclientandroidlib.client.methods.HttpPost;
+import org.opendatakit.httpclientandroidlib.conn.ConnectTimeoutException;
+import org.opendatakit.httpclientandroidlib.conn.HttpHostConnectException;
+import org.opendatakit.httpclientandroidlib.entity.mime.MultipartEntity;
+import org.opendatakit.httpclientandroidlib.entity.mime.content.FileBody;
+import org.opendatakit.httpclientandroidlib.entity.mime.content.StringBody;
+import org.opendatakit.httpclientandroidlib.protocol.HttpContext;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,37 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.InstanceUploaderListener;
-import org.odk.collect.android.logic.PropertyManager;
-import org.odk.collect.android.preferences.PreferencesActivity;
-import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
-import org.odk.collect.android.utilities.WebUtils;
-import org.opendatakit.httpclientandroidlib.Header;
-import org.opendatakit.httpclientandroidlib.HttpResponse;
-import org.opendatakit.httpclientandroidlib.HttpStatus;
-import org.opendatakit.httpclientandroidlib.client.ClientProtocolException;
-import org.opendatakit.httpclientandroidlib.client.HttpClient;
-import org.opendatakit.httpclientandroidlib.client.methods.HttpHead;
-import org.opendatakit.httpclientandroidlib.client.methods.HttpPost;
-import org.opendatakit.httpclientandroidlib.conn.ConnectTimeoutException;
-import org.opendatakit.httpclientandroidlib.conn.HttpHostConnectException;
-import org.opendatakit.httpclientandroidlib.entity.mime.MultipartEntity;
-import org.opendatakit.httpclientandroidlib.entity.mime.content.FileBody;
-import org.opendatakit.httpclientandroidlib.entity.mime.content.StringBody;
-import org.opendatakit.httpclientandroidlib.protocol.HttpContext;
-
-import android.content.ContentValues;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.webkit.MimeTypeMap;
-
 /**
  * Background task for uploading completed forms.
  *
@@ -76,9 +75,15 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
 
     private InstanceUploaderListener mStateListener;
 
-    public static class Outcome {
-        public Uri mAuthRequestingServer = null;
-        public HashMap<String, String> mResults = new HashMap<String, String>();
+    public static void copyToBytes(InputStream input, OutputStream output,
+                                   int bufferSize) throws IOException {
+        byte[] buf = new byte[bufferSize];
+        int bytesRead = input.read(buf);
+        while (bytesRead != -1) {
+            output.write(buf, 0, bytesRead);
+            bytesRead = input.read(buf);
+        }
+        output.flush();
     }
 
     /**
@@ -164,7 +169,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                                         fail
                                                 + "Unexpected redirection attempt to a different host: "
                                                 + uNew.toString());
-                                cv.put(InstanceColumns.STATUS,
+                                cv.put(InstanceProviderAPI.InstanceColumns.STATUS,
                                         InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                                 Collect.getInstance().getContentResolver()
                                         .update(toUpdate, cv, null, null);
@@ -173,7 +178,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                         } catch (Exception e) {
                             e.printStackTrace();
                             outcome.mResults.put(id, fail + urlString + " " + e.toString());
-                            cv.put(InstanceColumns.STATUS,
+                            cv.put(InstanceProviderAPI.InstanceColumns.STATUS,
                                     InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                             Collect.getInstance().getContentResolver()
                                     .update(toUpdate, cv, null, null);
@@ -190,7 +195,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                                 id,
                                 fail
                                         + "Invalid status code on Head request.  If you have a web proxy, you may need to login to your network. ");
-                        cv.put(InstanceColumns.STATUS,
+                        cv.put(InstanceProviderAPI.InstanceColumns.STATUS,
                                 InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                         Collect.getInstance().getContentResolver()
                                 .update(toUpdate, cv, null, null);
@@ -202,7 +207,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                 Log.e(t, e.toString());
                 WebUtils.clearHttpConnectionManager();
                 outcome.mResults.put(id, fail + "Client Protocol Exception");
-                cv.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
+                cv.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                 Collect.getInstance().getContentResolver().update(toUpdate, cv, null, null);
                 return true;
             } catch (ConnectTimeoutException e) {
@@ -210,7 +215,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                 Log.e(t, e.toString());
                 WebUtils.clearHttpConnectionManager();
                 outcome.mResults.put(id, fail + "Connection Timeout");
-                cv.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
+                cv.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                 Collect.getInstance().getContentResolver().update(toUpdate, cv, null, null);
                 return true;
             } catch (UnknownHostException e) {
@@ -218,7 +223,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                 Log.e(t, e.toString());
                 WebUtils.clearHttpConnectionManager();
                 outcome.mResults.put(id, fail + e.toString() + " :: Network Connection Failed");
-                cv.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
+                cv.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                 Collect.getInstance().getContentResolver().update(toUpdate, cv, null, null);
                 return true;
             } catch (SocketTimeoutException e) {
@@ -226,7 +231,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                 Log.e(t, e.toString());
                 WebUtils.clearHttpConnectionManager();
                 outcome.mResults.put(id, fail + "Connection Timeout");
-                cv.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
+                cv.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                 Collect.getInstance().getContentResolver().update(toUpdate, cv, null, null);
                 return true;
             } catch (HttpHostConnectException e) {
@@ -234,7 +239,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                 Log.e(t, e.toString());
                 WebUtils.clearHttpConnectionManager();
                 outcome.mResults.put(id, fail + "Network Connection Refused");
-                cv.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
+                cv.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                 Collect.getInstance().getContentResolver().update(toUpdate, cv, null, null);
                 return true;
             } catch (Exception e) {
@@ -246,7 +251,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                     msg = e.toString();
                 }
                 outcome.mResults.put(id, fail + "Generic Exception: " + msg);
-                cv.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
+                cv.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                 Collect.getInstance().getContentResolver().update(toUpdate, cv, null, null);
                 return true;
             }
@@ -281,7 +286,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
 
         if (!instanceFile.exists() && !submissionFile.exists()) {
             outcome.mResults.put(id, fail + "instance XML file does not exist!");
-            cv.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
+            cv.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
             Collect.getInstance().getContentResolver().update(toUpdate, cv, null, null);
             return true;
         }
@@ -452,7 +457,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                         outcome.mResults.put(id, fail + response.getStatusLine().getReasonPhrase()
                                 + " (" + responseCode + ") at " + urlString);
                     }
-                    cv.put(InstanceColumns.STATUS,
+                    cv.put(InstanceProviderAPI.InstanceColumns.STATUS,
                             InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                     Collect.getInstance().getContentResolver()
                             .update(toUpdate, cv, null, null);
@@ -467,7 +472,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                     msg = e.toString();
                 }
                 outcome.mResults.put(id, fail + "Generic Exception: " + msg);
-                cv.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
+                cv.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                 Collect.getInstance().getContentResolver().update(toUpdate, cv, null, null);
                 return true;
             }
@@ -475,7 +480,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
 
         // if it got here, it must have worked
         outcome.mResults.put(id, Collect.getInstance().getString(R.string.success));
-        cv.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMITTED);
+        cv.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_SUBMITTED);
         Collect.getInstance().getContentResolver().update(toUpdate, cv, null, null);
         return true;
     }
@@ -485,12 +490,12 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
     protected Outcome doInBackground(Long... values) {
         Outcome outcome = new Outcome();
 
-        String selection = InstanceColumns._ID + "=?";
+        String selection = InstanceProviderAPI.InstanceColumns._ID + "=?";
         String[] selectionArgs = new String[(values == null) ? 0 : values.length];
         if (values != null) {
             for (int i = 0; i < values.length; i++) {
                 if (i != values.length - 1) {
-                    selection += " or " + InstanceColumns._ID + "=?";
+                    selection += " or " + InstanceProviderAPI.InstanceColumns._ID + "=?";
                 }
                 selectionArgs[i] = values[i].toString();
             }
@@ -507,7 +512,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
         Cursor c = null;
         try {
             c = Collect.getInstance().getContentResolver()
-                    .query(InstanceColumns.CONTENT_URI, null, selection, selectionArgs, null);
+                    .query(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, selection, selectionArgs, null);
 
             if (c.getCount() > 0) {
                 c.moveToPosition(-1);
@@ -516,11 +521,11 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                         return outcome;
                     }
                     publishProgress(c.getPosition() + 1, c.getCount());
-                    String instance = c.getString(c.getColumnIndex(InstanceColumns.INSTANCE_FILE_PATH));
-                    String id = c.getString(c.getColumnIndex(InstanceColumns._ID));
-                    Uri toUpdate = Uri.withAppendedPath(InstanceColumns.CONTENT_URI, id);
+                    String instance = c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));
+                    String id = c.getString(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
+                    Uri toUpdate = Uri.withAppendedPath(InstanceProviderAPI.InstanceColumns.CONTENT_URI, id);
 
-                    int subIdx = c.getColumnIndex(InstanceColumns.SUBMISSION_URI);
+                    int subIdx = c.getColumnIndex(InstanceProviderAPI.InstanceColumns.SUBMISSION_URI);
                     String urlString = c.isNull(subIdx) ? null : c.getString(subIdx);
                     if (urlString == null) {
                         SharedPreferences settings =
@@ -581,7 +586,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                     selection.append("(");
                     while (it.hasNext()) {
                         String id = it.next();
-                        selection.append(InstanceColumns._ID + "=?");
+                        selection.append(InstanceProviderAPI.InstanceColumns._ID + "=?");
                         selectionArgs[i++] = id;
                         if (i != keys.size()) {
                             selection.append(" or ");
@@ -595,7 +600,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                         results = Collect
                                 .getInstance()
                                 .getContentResolver()
-                                .query(InstanceColumns.CONTENT_URI, null, selection.toString(),
+                                .query(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, selection.toString(),
                                         selectionArgs, null);
                         if (results.getCount() > 0) {
                             Long[] toDelete = new Long[results.getCount()];
@@ -604,7 +609,7 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
                             int cnt = 0;
                             while (results.moveToNext()) {
                                 toDelete[cnt] = results.getLong(results
-                                        .getColumnIndex(InstanceColumns._ID));
+                                        .getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
                                 cnt++;
                             }
 
@@ -646,16 +651,9 @@ public class InstanceUploaderTask extends AsyncTask<Long, Integer, InstanceUploa
         }
     }
 
-
-    public static void copyToBytes(InputStream input, OutputStream output,
-                                   int bufferSize) throws IOException {
-        byte[] buf = new byte[bufferSize];
-        int bytesRead = input.read(buf);
-        while (bytesRead != -1) {
-            output.write(buf, 0, bytesRead);
-            bytesRead = input.read(buf);
-        }
-        output.flush();
+    public static class Outcome {
+        public Uri mAuthRequestingServer = null;
+        public HashMap<String, String> mResults = new HashMap<String, String>();
     }
 
 }

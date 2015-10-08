@@ -14,16 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import java.lang.reflect.Field;
-import java.util.Calendar;
-import java.util.Date;
-
-import org.javarosa.core.model.data.DateData;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.joda.time.DateTime;
-import org.odk.collect.android.application.Collect;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
@@ -34,6 +24,16 @@ import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+
+import org.javarosa.core.model.data.DateData;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.joda.time.DateTime;
+import org.odk.collect.android.application.Collect;
+
+import java.lang.reflect.Field;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Displays a DatePicker widget. DateWidget handles leap years and does not allow dates that do not
@@ -56,7 +56,7 @@ public class DateWidget extends QuestionWidget {
         super(context, prompt);
 
         mDatePicker = new DatePicker(getContext());
-        mDatePicker.setId(QuestionWidget.newUniqueId());
+        mDatePicker.setId(newUniqueId());
         mDatePicker.setFocusable(!prompt.isReadOnly());
         mDatePicker.setEnabled(!prompt.isReadOnly());
 
@@ -176,7 +176,7 @@ public class DateWidget extends QuestionWidget {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    ((View) dayPicker).setVisibility(View.GONE);
+                    ((View) dayPicker).setVisibility(GONE);
                 }
                 if (hideMonth) {
                     if ("mMonthPicker".equals(datePickerDialogField.getName()) ||
@@ -188,7 +188,7 @@ public class DateWidget extends QuestionWidget {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                        ((View) monthPicker).setVisibility(View.GONE);
+                        ((View) monthPicker).setVisibility(GONE);
                     }
                 }
             }

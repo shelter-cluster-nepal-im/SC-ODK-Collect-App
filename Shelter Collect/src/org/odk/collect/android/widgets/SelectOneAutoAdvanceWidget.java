@@ -14,8 +14,18 @@
 
 package org.odk.collect.android.widgets;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
@@ -31,18 +41,8 @@ import org.odk.collect.android.external.ExternalSelectChoice;
 import org.odk.collect.android.listeners.AdvanceToNextListener;
 import org.odk.collect.android.views.MediaLayout;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RelativeLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * SelectOneWidgets handles select-one fields using radio buttons. Unlike the classic
@@ -95,7 +95,7 @@ public class SelectOneAutoAdvanceWidget extends QuestionWidget implements OnChec
                 r.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
                 r.setText(prompt.getSelectChoiceText(mItems.get(i)));
                 r.setTag(Integer.valueOf(i));
-                r.setId(QuestionWidget.newUniqueId());
+                r.setId(newUniqueId());
                 r.setEnabled(!prompt.isReadOnly());
                 r.setFocusable(!prompt.isReadOnly());
 

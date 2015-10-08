@@ -14,14 +14,24 @@
 
 package org.odk.collect.android.views;
 
-import java.io.Serializable;
-import java.util.*;
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.*;
+import android.os.Handler;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnLongClickListener;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TableLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormIndex;
@@ -42,14 +52,12 @@ import org.odk.collect.android.widgets.IBinaryWidget;
 import org.odk.collect.android.widgets.QuestionWidget;
 import org.odk.collect.android.widgets.WidgetFactory;
 
-import android.content.Context;
-import android.os.Handler;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.View.OnLongClickListener;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is
@@ -58,17 +66,14 @@ import android.view.View.OnLongClickListener;
  */
 public class ODKView extends ScrollView implements OnLongClickListener {
 
+    public final static String FIELD_LIST = "field-list";
     // starter random number for view IDs
     private final static int VIEW_ID = 12345;
-
     private final static String t = "ODKView";
-
     private LinearLayout mView;
     private LinearLayout.LayoutParams mLayout;
     private ArrayList<QuestionWidget> widgets;
     private Handler h = null;
-
-    public final static String FIELD_LIST = "field-list";
 
     public ODKView(Context context, final FormEntryPrompt[] questionPrompts,
                    FormEntryCaption[] groups, boolean advancingPage) {

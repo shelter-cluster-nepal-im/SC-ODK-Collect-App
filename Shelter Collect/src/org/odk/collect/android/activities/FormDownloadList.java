@@ -14,24 +14,6 @@
 
 package org.odk.collect.android.activities;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-
-import android.database.Cursor;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.FormDownloaderListener;
-import org.odk.collect.android.listeners.FormListDownloaderListener;
-import org.odk.collect.android.logic.FormDetails;
-import org.odk.collect.android.preferences.PreferencesActivity;
-import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
-import org.odk.collect.android.tasks.DownloadFormListTask;
-import org.odk.collect.android.tasks.DownloadFormsTask;
-import org.odk.collect.android.utilities.CompatibilityUtils;
-import org.odk.collect.android.utilities.WebUtils;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -40,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -60,6 +43,22 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.FormDownloaderListener;
+import org.odk.collect.android.listeners.FormListDownloaderListener;
+import org.odk.collect.android.logic.FormDetails;
+import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.provider.FormsProviderAPI;
+import org.odk.collect.android.tasks.DownloadFormListTask;
+import org.odk.collect.android.tasks.DownloadFormsTask;
+import org.odk.collect.android.utilities.CompatibilityUtils;
+import org.odk.collect.android.utilities.WebUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+
 /**
  * Responsible for displaying, adding and deleting all the valid forms in the forms directory. One
  * caveat. If the server requires authentication, a dialog will pop up asking when you request the
@@ -76,12 +75,11 @@ import android.widget.Toast;
  */
 public class FormDownloadList extends ListActivity implements FormListDownloaderListener,
         FormDownloaderListener {
+    public static final String LIST_URL = "listurl";
     private static final String t = "RemoveFileManageList";
-
     private static final int PROGRESS_DIALOG = 1;
     private static final int AUTH_DIALOG = 2;
     private static final int MENU_PREFERENCES = Menu.FIRST;
-
     private static final String BUNDLE_TOGGLED_KEY = "toggled";
     private static final String BUNDLE_SELECTED_COUNT = "selectedcount";
     private static final String BUNDLE_FORM_MAP = "formmap";
@@ -89,41 +87,79 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
     private static final String DIALOG_MSG = "dialogmsg";
     private static final String DIALOG_SHOWING = "dialogshowing";
     private static final String FORMLIST = "formlist";
-
-    public static final String LIST_URL = "listurl";
-
     private static final String FORMNAME = "formname";
     private static final String FORMDETAIL_KEY = "formdetailkey";
     private static final String FORMID_DISPLAY = "formiddisplay";
 
     private static final String FORM_ID_KEY = "formid";
     private static final String FORM_VERSION_KEY = "formversion";
-
+    private static final boolean EXIT = true;
+    private static final boolean DO_NOT_EXIT = false;
+    private static final String SHOULD_EXIT = "shouldexit";
     private String mAlertMsg;
     private boolean mAlertShowing = false;
     private String mAlertTitle;
-
     private AlertDialog mAlertDialog;
     private ProgressDialog mProgressDialog;
     private Button mDownloadButton;
-
     private DownloadFormListTask mDownloadFormListTask;
     private DownloadFormsTask mDownloadFormsTask;
     private Button mToggleButton;
     private Button mRefreshButton;
-
     private HashMap<String, FormDetails> mFormNamesAndURLs = new HashMap<String, FormDetails>();
     private SimpleAdapter mFormListAdapter;
     private ArrayList<HashMap<String, String>> mFormList;
-
     private boolean mToggled = false;
     private int mSelectedCount = 0;
-
-    private static final boolean EXIT = true;
-    private static final boolean DO_NOT_EXIT = false;
     private boolean mShouldExit;
-    private static final String SHOULD_EXIT = "shouldexit";
 
+    /**
+     * Determines if a local form on the device is superseded by a given version (of the same form presumably available
+     * on the server).
+     *
+     * @param formId        the form to be checked. A form with this ID may or may not reside on the local device.
+     * @param latestVersion the version against which the local form (if any) is tested.
+     * @return true if a form with id <code>formId</code> exists on the local device and its version is less than
+     * <code>latestVersion</code>.
+     */
+    public static boolean isLocalFormSuperseded(String formId, String latestVersion) {
+
+        String[] selectionArgs = {formId};
+        String selection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=?";
+        String[] fields = {FormsProviderAPI.FormsColumns.JR_VERSION};
+
+        Cursor formCursor = null;
+        try {
+            formCursor = Collect.getInstance().getContentResolver().query(FormsProviderAPI.FormsColumns.CONTENT_URI, fields, selection, selectionArgs, null);
+            if (formCursor.getCount() == 0) {
+                // form does not already exist locally
+                return true;
+            }
+            formCursor.moveToFirst();
+            int idxJrVersion = formCursor.getColumnIndex(fields[0]);
+            if (formCursor.isNull(idxJrVersion)) {
+                // any non-null version on server is newer
+                return (latestVersion != null);
+            }
+            String jr_version = formCursor.getString(idxJrVersion);
+            // apparently, the isNull() predicate above is not respected on all Android OSes???
+            if (jr_version == null && latestVersion == null) {
+                return false;
+            }
+            if (jr_version == null) {
+                return true;
+            }
+            if (latestVersion == null) {
+                return false;
+            }
+            // if what we have is less, then the server is newer
+            return (jr_version.compareTo(latestVersion) < 0);
+        } finally {
+            if (formCursor != null) {
+                formCursor.close();
+            }
+        }
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -261,7 +297,6 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         setListAdapter(mFormListAdapter);
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -279,7 +314,6 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         mDownloadButton.setEnabled(false);
     }
 
-
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -296,7 +330,6 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
             Collect.getInstance().getActivityLogger().logAction(this, "onListItemClick", "<missing form detail>");
         }
     }
-
 
     /**
      * Starts the download task and shows the progress dialog.
@@ -332,7 +365,6 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         }
     }
 
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -345,7 +377,6 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         outState.putBoolean(SHOULD_EXIT, mShouldExit);
         outState.putSerializable(FORMLIST, mFormList);
     }
-
 
     /**
      * returns the number of items currently selected in the list.
@@ -364,7 +395,6 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         return count;
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         Collect.getInstance().getActivityLogger().logAction(this, "onCreateOptionsMenu", "show");
@@ -377,7 +407,6 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         return true;
     }
 
-
     @Override
     public boolean onMenuItemSelected(int featureId, MenuItem item) {
         switch (item.getItemId()) {
@@ -389,7 +418,6 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         }
         return super.onMenuItemSelected(featureId, item);
     }
-
 
     @Override
     protected Dialog onCreateDialog(int id) {
@@ -485,7 +513,6 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         return null;
     }
 
-
     /**
      * starts the task to download the selected forms, also shows progress dialog
      */
@@ -519,7 +546,6 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         }
     }
 
-
     @Override
     public Object onRetainNonConfigurationInstance() {
         if (mDownloadFormsTask != null) {
@@ -528,7 +554,6 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
             return mDownloadFormListTask;
         }
     }
-
 
     @Override
     protected void onDestroy() {
@@ -540,7 +565,6 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         }
         super.onDestroy();
     }
-
 
     @Override
     protected void onResume() {
@@ -556,61 +580,12 @@ public class FormDownloadList extends ListActivity implements FormListDownloader
         super.onResume();
     }
 
-
     @Override
     protected void onPause() {
         if (mAlertDialog != null && mAlertDialog.isShowing()) {
             mAlertDialog.dismiss();
         }
         super.onPause();
-    }
-
-    /**
-     * Determines if a local form on the device is superseded by a given version (of the same form presumably available
-     * on the server).
-     *
-     * @param formId        the form to be checked. A form with this ID may or may not reside on the local device.
-     * @param latestVersion the version against which the local form (if any) is tested.
-     * @return true if a form with id <code>formId</code> exists on the local device and its version is less than
-     * <code>latestVersion</code>.
-     */
-    public static boolean isLocalFormSuperseded(String formId, String latestVersion) {
-
-        String[] selectionArgs = {formId};
-        String selection = FormsColumns.JR_FORM_ID + "=?";
-        String[] fields = {FormsColumns.JR_VERSION};
-
-        Cursor formCursor = null;
-        try {
-            formCursor = Collect.getInstance().getContentResolver().query(FormsColumns.CONTENT_URI, fields, selection, selectionArgs, null);
-            if (formCursor.getCount() == 0) {
-                // form does not already exist locally
-                return true;
-            }
-            formCursor.moveToFirst();
-            int idxJrVersion = formCursor.getColumnIndex(fields[0]);
-            if (formCursor.isNull(idxJrVersion)) {
-                // any non-null version on server is newer
-                return (latestVersion != null);
-            }
-            String jr_version = formCursor.getString(idxJrVersion);
-            // apparently, the isNull() predicate above is not respected on all Android OSes???
-            if (jr_version == null && latestVersion == null) {
-                return false;
-            }
-            if (jr_version == null) {
-                return true;
-            }
-            if (latestVersion == null) {
-                return false;
-            }
-            // if what we have is less, then the server is newer
-            return (jr_version.compareTo(latestVersion) < 0);
-        } finally {
-            if (formCursor != null) {
-                formCursor.close();
-            }
-        }
     }
 
     /**

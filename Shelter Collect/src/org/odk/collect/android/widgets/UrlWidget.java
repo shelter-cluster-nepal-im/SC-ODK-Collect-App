@@ -14,12 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -28,10 +22,15 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
 
 /**
  * Widget that allows user to open URLs from within the form
@@ -44,14 +43,14 @@ public class UrlWidget extends QuestionWidget {
 
     public UrlWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
-        setOrientation(LinearLayout.VERTICAL);
+        setOrientation(VERTICAL);
 
         TableLayout.LayoutParams params = new TableLayout.LayoutParams();
         params.setMargins(7, 5, 7, 5);
 
         // set button formatting
         mOpenUrlButton = new Button(getContext());
-        mOpenUrlButton.setId(QuestionWidget.newUniqueId());
+        mOpenUrlButton.setId(newUniqueId());
         mOpenUrlButton.setText(getContext().getString(R.string.open_url));
         mOpenUrlButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
                 mAnswerFontsize);
@@ -80,7 +79,7 @@ public class UrlWidget extends QuestionWidget {
 
         // set text formatting
         mStringAnswer = new TextView(getContext());
-        mStringAnswer.setId(QuestionWidget.newUniqueId());
+        mStringAnswer.setId(newUniqueId());
         mStringAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mStringAnswer.setGravity(Gravity.CENTER);
 

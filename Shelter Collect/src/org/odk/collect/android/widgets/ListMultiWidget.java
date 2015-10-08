@@ -14,9 +14,22 @@
 
 package org.odk.collect.android.widgets;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Typeface;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
@@ -33,23 +46,9 @@ import org.odk.collect.android.external.ExternalDataUtil;
 import org.odk.collect.android.external.ExternalSelectChoice;
 import org.odk.collect.android.utilities.FileUtils;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Typeface;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.View;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ListMultiWidget handles multiple selection fields using check boxes. The check boxes are aligned
@@ -102,7 +101,7 @@ public class ListMultiWidget extends QuestionWidget {
             for (int i = 0; i < mItems.size(); i++) {
                 CheckBox c = new CheckBox(getContext());
                 c.setTag(Integer.valueOf(i));
-                c.setId(QuestionWidget.newUniqueId());
+                c.setId(newUniqueId());
                 c.setFocusable(!prompt.isReadOnly());
                 c.setEnabled(!prompt.isReadOnly());
                 for (int vi = 0; vi < ve.size(); vi++) {
@@ -144,7 +143,7 @@ public class ListMultiWidget extends QuestionWidget {
                 ImageView mImageView = null;
                 TextView mMissingImage = null;
 
-                final int labelId = QuestionWidget.newUniqueId();
+                final int labelId = newUniqueId();
 
                 // Now set up the image view
                 String errorMsg = null;
@@ -212,7 +211,7 @@ public class ListMultiWidget extends QuestionWidget {
                 label.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
                 label.setGravity(Gravity.CENTER_HORIZONTAL);
                 if (!displayLabel) {
-                    label.setVisibility(View.GONE);
+                    label.setVisibility(GONE);
                 }
 
                 // answer layout holds the label text/image on top and the radio button on bottom
@@ -229,7 +228,7 @@ public class ListMultiWidget extends QuestionWidget {
                 if (mImageView != null) {
                     mImageView.setScaleType(ScaleType.CENTER);
                     if (!displayLabel) {
-                        mImageView.setVisibility(View.GONE);
+                        mImageView.setVisibility(GONE);
                     }
                     answer.addView(mImageView, headerParams);
                 } else if (mMissingImage != null) {
@@ -260,7 +259,7 @@ public class ListMultiWidget extends QuestionWidget {
 
         // Align the buttons so that they appear horizonally and are right justified
         // buttonLayout.setGravity(Gravity.RIGHT);
-        buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+        buttonLayout.setOrientation(HORIZONTAL);
         // LinearLayout.LayoutParams params = new
         // LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         // buttonLayout.setLayoutParams(params);
@@ -325,7 +324,7 @@ public class ListMultiWidget extends QuestionWidget {
         questionText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
         questionText.setTypeface(null, Typeface.BOLD);
         questionText.setPadding(0, 0, 0, 7);
-        questionText.setId(QuestionWidget.newUniqueId()); // assign random id
+        questionText.setId(newUniqueId()); // assign random id
 
         // Wrap to the size of the parent view
         questionText.setHorizontallyScrolling(false);
@@ -340,7 +339,7 @@ public class ListMultiWidget extends QuestionWidget {
         labelParams.weight = 1;
 
         questionLayout = new LinearLayout(getContext());
-        questionLayout.setOrientation(LinearLayout.HORIZONTAL);
+        questionLayout.setOrientation(HORIZONTAL);
 
         questionLayout.addView(questionText, labelParams);
     }

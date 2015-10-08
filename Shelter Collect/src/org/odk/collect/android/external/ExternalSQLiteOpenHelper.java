@@ -22,8 +22,6 @@ import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import au.com.bytecode.opencsv.CSVReader;
-
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.database.ODKSQLiteOpenHelper;
@@ -38,6 +36,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 /**
  * Author: Meletis Margaritis

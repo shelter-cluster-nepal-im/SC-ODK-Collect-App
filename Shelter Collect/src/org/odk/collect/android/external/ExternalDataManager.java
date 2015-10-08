@@ -18,6 +18,8 @@
 
 package org.odk.collect.android.external;
 
+import org.odk.collect.android.exception.ExternalDataException;
+
 /**
  * This class handles all DB connections for the function handlers
  * <p>
@@ -31,7 +33,7 @@ public interface ExternalDataManager {
      * Returns an object of {@link ExternalSQLiteOpenHelper}
      *
      * @param dataSetName the name of the imported .csv
-     * @param required    if true, a runtime exception ({@link org.odk.collect.android.exception.ExternalDataException}) will be thrown.
+     * @param required    if true, a runtime exception ({@link ExternalDataException}) will be thrown.
      *                    if false null will be returned
      * @return an object of {@link ExternalSQLiteOpenHelper}
      */

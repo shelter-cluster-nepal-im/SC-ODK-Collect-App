@@ -14,8 +14,6 @@
 
 package org.odk.collect.android.picasa;
 
-import java.io.IOException;
-
 import com.google.api.client.googleapis.xml.atom.AtomPatchRelativeToOriginalContent;
 import com.google.api.client.googleapis.xml.atom.GoogleAtom;
 import com.google.api.client.http.GenericUrl;
@@ -24,6 +22,8 @@ import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.xml.atom.AtomContent;
 import com.google.api.client.xml.XmlNamespaceDictionary;
 import com.google.api.client.xml.XmlObjectParser;
+
+import java.io.IOException;
 
 /**
  * GData XML client.

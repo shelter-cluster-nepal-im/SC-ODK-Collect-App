@@ -15,9 +15,6 @@
 
 package org.odk.collect.android.picasa;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 import com.google.api.client.http.AbstractInputStreamContent;
 import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpRequest;
@@ -27,6 +24,9 @@ import com.google.api.client.http.MultipartContent;
 import com.google.api.client.http.xml.atom.AtomContent;
 import com.google.api.client.xml.XmlNamespaceDictionary;
 import com.google.api.client.xml.atom.Atom;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Client for the Picasa Web Albums Data API.

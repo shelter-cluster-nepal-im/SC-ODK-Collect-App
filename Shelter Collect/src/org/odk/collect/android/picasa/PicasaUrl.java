@@ -22,13 +22,11 @@ import com.google.api.client.util.Key;
  */
 public class PicasaUrl extends GenericUrl {
 
+    public static final String ROOT_URL = "https://picasaweb.google.com/data/";
     /**
      * Whether to pretty print HTTP requests and responses.
      */
     private static final boolean PRETTY_PRINT = true;
-
-    public static final String ROOT_URL = "https://picasaweb.google.com/data/";
-
     @Key("max-results")
     public Integer maxResults;
 

@@ -14,7 +14,12 @@
 
 package org.odk.collect.android.application;
 
-import java.io.File;
+import android.app.Application;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 
 import org.odk.collect.android.R;
 import org.odk.collect.android.database.ActivityLogger;
@@ -30,12 +35,7 @@ import org.opendatakit.httpclientandroidlib.impl.client.BasicCookieStore;
 import org.opendatakit.httpclientandroidlib.protocol.BasicHttpContext;
 import org.opendatakit.httpclientandroidlib.protocol.HttpContext;
 
-import android.app.Application;
-import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.os.Environment;
-import android.preference.PreferenceManager;
+import java.io.File;
 
 /**
  * Extends the Application class to implement
@@ -57,7 +57,7 @@ public class Collect extends Application {
     public static final String LOG_PATH = ODK_ROOT + File.separator + "log";
 
     public static final String DEFAULT_FONTSIZE = "21";
-
+    private static Collect singleton = null;
     // share all session cookies across all sessions...
     private CookieStore cookieStore = new BasicCookieStore();
     // retain credentials for 7 minutes...
@@ -66,30 +66,8 @@ public class Collect extends Application {
     private FormController mFormController = null;
     private ExternalDataManager externalDataManager;
 
-    private static Collect singleton = null;
-
     public static Collect getInstance() {
         return singleton;
-    }
-
-    public ActivityLogger getActivityLogger() {
-        return mActivityLogger;
-    }
-
-    public FormController getFormController() {
-        return mFormController;
-    }
-
-    public void setFormController(FormController controller) {
-        mFormController = controller;
-    }
-
-    public ExternalDataManager getExternalDataManager() {
-        return externalDataManager;
-    }
-
-    public void setExternalDataManager(ExternalDataManager externalDataManager) {
-        this.externalDataManager = externalDataManager;
     }
 
     public static int getQuestionFontsize() {
@@ -99,21 +77,6 @@ public class Collect extends Application {
                 Collect.DEFAULT_FONTSIZE);
         int questionFontsize = Integer.valueOf(question_font);
         return questionFontsize;
-    }
-
-    public String getVersionedAppName() {
-        String versionDetail = "";
-        try {
-            PackageInfo pinfo;
-            pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            int versionNumber = pinfo.versionCode;
-            String versionName = pinfo.versionName;
-            versionDetail = " " + versionName + " (" + versionNumber + ")";
-        } catch (NameNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return getString(R.string.app_name) + versionDetail;
     }
 
     /**
@@ -173,6 +136,41 @@ public class Collect extends Application {
             }
         }
         return false;
+    }
+
+    public ActivityLogger getActivityLogger() {
+        return mActivityLogger;
+    }
+
+    public FormController getFormController() {
+        return mFormController;
+    }
+
+    public void setFormController(FormController controller) {
+        mFormController = controller;
+    }
+
+    public ExternalDataManager getExternalDataManager() {
+        return externalDataManager;
+    }
+
+    public void setExternalDataManager(ExternalDataManager externalDataManager) {
+        this.externalDataManager = externalDataManager;
+    }
+
+    public String getVersionedAppName() {
+        String versionDetail = "";
+        try {
+            PackageInfo pinfo;
+            pinfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            int versionNumber = pinfo.versionCode;
+            String versionName = pinfo.versionName;
+            versionDetail = " " + versionName + " (" + versionNumber + ")";
+        } catch (NameNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return getString(R.string.app_name) + versionDetail;
     }
 
     /**

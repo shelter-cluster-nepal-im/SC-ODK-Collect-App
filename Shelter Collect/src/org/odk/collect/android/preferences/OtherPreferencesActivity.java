@@ -14,8 +14,6 @@
 
 package org.odk.collect.android.preferences;
 
-import org.odk.collect.android.R;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
@@ -23,6 +21,8 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceCategory;
 import android.text.InputFilter;
+
+import org.odk.collect.android.R;
 
 /**
  * Handles 'other' specific preferences.

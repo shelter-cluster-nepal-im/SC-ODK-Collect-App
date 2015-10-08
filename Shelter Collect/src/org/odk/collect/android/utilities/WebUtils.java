@@ -14,18 +14,11 @@
 
 package org.odk.collect.android.utilities;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.zip.GZIPInputStream;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.text.format.DateFormat;
+import android.util.Log;
 
 import org.apache.http.HttpStatus;
 import org.kxml2.io.KXmlParser;
@@ -63,11 +56,18 @@ import org.opendatakit.httpclientandroidlib.params.HttpParams;
 import org.opendatakit.httpclientandroidlib.protocol.HttpContext;
 import org.xmlpull.v1.XmlPullParser;
 
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.text.format.DateFormat;
-import android.util.Log;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Common utility methods for managing the credentials associated with the
@@ -81,14 +81,11 @@ public final class WebUtils {
 
     public static final String OPEN_ROSA_VERSION_HEADER = "X-OpenRosa-Version";
     public static final String OPEN_ROSA_VERSION = "1.0";
-    private static final String DATE_HEADER = "Date";
-
     public static final String HTTP_CONTENT_TYPE_TEXT_XML = "text/xml";
     public static final int CONNECTION_TIMEOUT = 30000;
-
     public static final String ACCEPT_ENCODING_HEADER = "Accept-Encoding";
     public static final String GZIP_CONTENT_ENCODING = "gzip";
-
+    private static final String DATE_HEADER = "Date";
     private static ClientConnectionManager httpConnectionManager = null;
 
     public static final List<AuthScope> buildAuthScopes(String host) {

@@ -14,8 +14,11 @@
 
 package org.odk.collect.android.tasks;
 
-import org.opendatakit.httpclientandroidlib.client.HttpClient;
-import org.opendatakit.httpclientandroidlib.protocol.HttpContext;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.util.Log;
+
 import org.javarosa.xform.parse.XFormParser;
 import org.kxml2.kdom.Element;
 import org.odk.collect.android.R;
@@ -25,11 +28,8 @@ import org.odk.collect.android.logic.FormDetails;
 import org.odk.collect.android.preferences.PreferencesActivity;
 import org.odk.collect.android.utilities.DocumentFetchResult;
 import org.odk.collect.android.utilities.WebUtils;
-
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.preference.PreferenceManager;
-import android.util.Log;
+import org.opendatakit.httpclientandroidlib.client.HttpClient;
+import org.opendatakit.httpclientandroidlib.protocol.HttpContext;
 
 import java.util.HashMap;
 
@@ -42,17 +42,13 @@ import java.util.HashMap;
  * @author carlhartung
  */
 public class DownloadFormListTask extends AsyncTask<Void, String, HashMap<String, FormDetails>> {
-    private static final String t = "DownloadFormsTask";
-
     // used to store error message if one occurs
     public static final String DL_ERROR_MSG = "dlerrormessage";
     public static final String DL_AUTH_REQUIRED = "dlauthrequired";
-
-    private FormListDownloaderListener mStateListener;
-
+    private static final String t = "DownloadFormsTask";
     private static final String NAMESPACE_OPENROSA_ORG_XFORMS_XFORMS_LIST =
             "http://openrosa.org/xforms/xformsList";
-
+    private FormListDownloaderListener mStateListener;
 
     private boolean isXformsListNamespacedElement(Element e) {
         return e.getNamespace().equalsIgnoreCase(NAMESPACE_OPENROSA_ORG_XFORMS_XFORMS_LIST);

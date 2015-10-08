@@ -14,17 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import java.io.File;
-
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.R;
-import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.utilities.FileUtils;
-import org.odk.collect.android.utilities.MediaUtils;
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
@@ -41,10 +30,20 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
+import org.odk.collect.android.activities.FormEntryActivity;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.utilities.MediaUtils;
+
+import java.io.File;
 
 /**
  * Widget that allows user to take pictures, sounds or video and add them to the form.
@@ -72,18 +71,18 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
         mInstanceFolder =
                 Collect.getInstance().getFormController().getInstancePath().getParent();
 
-        setOrientation(LinearLayout.VERTICAL);
+        setOrientation(VERTICAL);
 
         TableLayout.LayoutParams params = new TableLayout.LayoutParams();
         params.setMargins(7, 5, 7, 5);
 
         mErrorTextView = new TextView(context);
-        mErrorTextView.setId(QuestionWidget.newUniqueId());
+        mErrorTextView.setId(newUniqueId());
         mErrorTextView.setText("Selected file is not a valid image");
 
         // setup capture button
         mCaptureButton = new Button(getContext());
-        mCaptureButton.setId(QuestionWidget.newUniqueId());
+        mCaptureButton.setId(newUniqueId());
         mCaptureButton.setText(getContext().getString(R.string.capture_image));
         mCaptureButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mCaptureButton.setPadding(20, 20, 20, 20);
@@ -96,7 +95,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
             public void onClick(View v) {
                 Collect.getInstance().getActivityLogger().logInstanceAction(this, "captureButton",
                         "click", mPrompt.getIndex());
-                mErrorTextView.setVisibility(View.GONE);
+                mErrorTextView.setVisibility(GONE);
                 Intent i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 // We give the camera an absolute filename/path where to put the
                 // picture because of bug:
@@ -126,7 +125,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
 
         // setup chooser button
         mChooseButton = new Button(getContext());
-        mChooseButton.setId(QuestionWidget.newUniqueId());
+        mChooseButton.setId(newUniqueId());
         mChooseButton.setText(getContext().getString(R.string.choose_image));
         mChooseButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mChooseButton.setPadding(20, 20, 20, 20);
@@ -139,7 +138,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
             public void onClick(View v) {
                 Collect.getInstance().getActivityLogger().logInstanceAction(this, "chooseButton",
                         "click", mPrompt.getIndex());
-                mErrorTextView.setVisibility(View.GONE);
+                mErrorTextView.setVisibility(GONE);
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.setType("image/*");
 
@@ -165,10 +164,10 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
 
         // and hide the capture and choose button if read-only
         if (prompt.isReadOnly()) {
-            mCaptureButton.setVisibility(View.GONE);
-            mChooseButton.setVisibility(View.GONE);
+            mCaptureButton.setVisibility(GONE);
+            mChooseButton.setVisibility(GONE);
         }
-        mErrorTextView.setVisibility(View.GONE);
+        mErrorTextView.setVisibility(GONE);
 
         // retrieve answer from data model and update ui
         mBinaryName = prompt.getAnswerText();
@@ -176,7 +175,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
         // Only add the imageView if the user has taken a picture
         if (mBinaryName != null) {
             mImageView = new ImageView(getContext());
-            mImageView.setId(QuestionWidget.newUniqueId());
+            mImageView.setId(newUniqueId());
             Display display =
                     ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE))
                             .getDefaultDisplay();
@@ -188,7 +187,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
             if (f.exists()) {
                 Bitmap bmp = FileUtils.getBitmapScaledToDisplay(f, screenHeight, screenWidth);
                 if (bmp == null) {
-                    mErrorTextView.setVisibility(View.VISIBLE);
+                    mErrorTextView.setVisibility(VISIBLE);
                 }
                 mImageView.setImageBitmap(bmp);
             } else {
@@ -239,7 +238,7 @@ public class ImageWidget extends QuestionWidget implements IBinaryWidget {
         // remove the file
         deleteMedia();
         mImageView.setImageBitmap(null);
-        mErrorTextView.setVisibility(View.GONE);
+        mErrorTextView.setVisibility(GONE);
 
         // reset buttons
         mCaptureButton.setText(getContext().getString(R.string.capture_image));

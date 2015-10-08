@@ -14,14 +14,6 @@
 
 package org.odk.collect.android.activities;
 
-import java.text.DecimalFormat;
-import java.util.List;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.utilities.InfoLogger;
-import org.odk.collect.android.widgets.GeoPointWidget;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -33,6 +25,14 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.utilities.InfoLogger;
+import org.odk.collect.android.widgets.GeoPointWidget;
+
+import java.text.DecimalFormat;
+import java.util.List;
 
 public class GeoPointActivity extends Activity implements LocationListener {
 

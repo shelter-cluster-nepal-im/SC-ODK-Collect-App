@@ -14,23 +14,6 @@
 
 package org.odk.collect.android.activities;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.lang.ref.WeakReference;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.preferences.AdminPreferencesActivity;
-import org.odk.collect.android.preferences.PreferencesActivity;
-import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
-import org.odk.collect.android.utilities.CompatibilityUtils;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -52,11 +35,25 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.preferences.AdminPreferencesActivity;
+import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.collect.android.utilities.CompatibilityUtils;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Responsible for displaying buttons to launch the major activities. Launches
@@ -73,30 +70,24 @@ public class MainMenuActivity extends Activity {
     // menu options
     private static final int MENU_PREFERENCES = Menu.FIRST;
     private static final int MENU_ADMIN = Menu.FIRST + 1;
-
+    private static boolean EXIT = true;
     // buttons
     private ImageButton mEnterDataButton;
     private ImageButton mManageFilesButton;
     private ImageButton mSendDataButton;
     private ImageButton mReviewDataButton;
     private ImageButton mGetFormsButton;
-
+    private ImageButton mAccessLocButton;
     private View mReviewSpacer;
     private View mGetFormsSpacer;
-
     private AlertDialog mAlertDialog;
     private SharedPreferences mAdminPreferences;
-
     private int mCompletedCount;
     private int mSavedCount;
-
     private Cursor mFinalizedCursor;
     private Cursor mSavedCursor;
-
     private IncomingHandler mHandler = new IncomingHandler(this);
     private MyContentObserver mContentObserver = new MyContentObserver();
-
-    private static boolean EXIT = true;
 
     // private static boolean DO_NOT_EXIT = false;
 
@@ -120,7 +111,7 @@ public class MainMenuActivity extends Activity {
             // dynamically construct the "ODK Collect vA.B" string
             //TextView mainMenuMessageLabel = (TextView) findViewById(R.id.main_menu_header);
             /*mainMenuMessageLabel.setText(Collect.getInstance()
-					.getVersionedAppName());*/
+                    .getVersionedAppName());*/
         }
 
         setTitle(getString(R.string.app_name) + " > "
@@ -229,14 +220,26 @@ public class MainMenuActivity extends Activity {
             }
         });
 
+        // access map button
+       /* mAccessLocButton = (ImageButton) findViewById(R.id.access_map);
+        mAccessLocButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                *//*Collect.getInstance().getActivityLogger()
+                        .logAction(this, "AccessMap", "click");*//*
+                Intent i = new Intent(MainMenuActivity.this,
+                        MapsActivity.class);
+                startActivity(i);
+            }
+        });*/
         // count for finalized instances
-        String selection = InstanceColumns.STATUS + "=? or "
-                + InstanceColumns.STATUS + "=?";
+        String selection = InstanceProviderAPI.InstanceColumns.STATUS + "=? or "
+                + InstanceProviderAPI.InstanceColumns.STATUS + "=?";
         String selectionArgs[] = {InstanceProviderAPI.STATUS_COMPLETE,
                 InstanceProviderAPI.STATUS_SUBMISSION_FAILED};
 
         try {
-            mFinalizedCursor = managedQuery(InstanceColumns.CONTENT_URI, null,
+            mFinalizedCursor = managedQuery(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null,
                     selection, selectionArgs, null);
         } catch (Exception e) {
             createErrorDialog(e.getMessage(), EXIT);
@@ -247,15 +250,15 @@ public class MainMenuActivity extends Activity {
             startManagingCursor(mFinalizedCursor);
         }
         mCompletedCount = mFinalizedCursor != null ? mFinalizedCursor.getCount() : 0;
-        getContentResolver().registerContentObserver(InstanceColumns.CONTENT_URI, true, mContentObserver);
+        getContentResolver().registerContentObserver(InstanceProviderAPI.InstanceColumns.CONTENT_URI, true, mContentObserver);
 //		mFinalizedCursor.registerContentObserver(mContentObserver);
 
         // count for finalized instances
-        String selectionSaved = InstanceColumns.STATUS + "=?";
+        String selectionSaved = InstanceProviderAPI.InstanceColumns.STATUS + "=?";
         String selectionArgsSaved[] = {InstanceProviderAPI.STATUS_INCOMPLETE};
 
         try {
-            mSavedCursor = managedQuery(InstanceColumns.CONTENT_URI, null,
+            mSavedCursor = managedQuery(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null,
                     selectionSaved, selectionArgsSaved, null);
         } catch (Exception e) {
             createErrorDialog(e.getMessage(), EXIT);
@@ -345,10 +348,10 @@ public class MainMenuActivity extends Activity {
                 menu.add(0, MENU_PREFERENCES, 0, R.string.general_preferences)
                         .setIcon(R.drawable.ic_menu_preferences),
                 MenuItem.SHOW_AS_ACTION_NEVER);
-        CompatibilityUtils.setShowAsAction(
+        /*CompatibilityUtils.setShowAsAction(
                 menu.add(0, MENU_ADMIN, 0, R.string.admin_preferences)
                         .setIcon(R.drawable.ic_menu_login),
-                MenuItem.SHOW_AS_ACTION_NEVER);
+                MenuItem.SHOW_AS_ACTION_NEVER);*/
         return true;
     }
 
@@ -502,41 +505,6 @@ public class MainMenuActivity extends Activity {
         }
     }
 
-    /**
-     * notifies us that something changed
-     */
-    private class MyContentObserver extends ContentObserver {
-
-        public MyContentObserver() {
-            super(null);
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            super.onChange(selfChange);
-            mHandler.sendEmptyMessage(0);
-        }
-    }
-
-    /*
-     * Used to prevent memory leaks
-     */
-    static class IncomingHandler extends Handler {
-        private final WeakReference<MainMenuActivity> mTarget;
-
-        IncomingHandler(MainMenuActivity target) {
-            mTarget = new WeakReference<MainMenuActivity>(target);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            MainMenuActivity target = mTarget.get();
-            if (target != null) {
-                target.updateButtons();
-            }
-        }
-    }
-
     private boolean loadSharedPreferencesFromFile(File src) {
         // this should probably be in a thread if it ever gets big
         boolean res = false;
@@ -604,6 +572,41 @@ public class MainMenuActivity extends Activity {
             }
         }
         return res;
+    }
+
+    /*
+     * Used to prevent memory leaks
+     */
+    static class IncomingHandler extends Handler {
+        private final WeakReference<MainMenuActivity> mTarget;
+
+        IncomingHandler(MainMenuActivity target) {
+            mTarget = new WeakReference<MainMenuActivity>(target);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            MainMenuActivity target = mTarget.get();
+            if (target != null) {
+                target.updateButtons();
+            }
+        }
+    }
+
+    /**
+     * notifies us that something changed
+     */
+    private class MyContentObserver extends ContentObserver {
+
+        public MyContentObserver() {
+            super(null);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            mHandler.sendEmptyMessage(0);
+        }
     }
 
 }

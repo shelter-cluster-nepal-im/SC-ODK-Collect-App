@@ -14,17 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import java.io.File;
-import java.util.Date;
-
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.R;
-import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.utilities.MediaUtils;
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
@@ -43,10 +32,20 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
+import org.odk.collect.android.activities.FormEntryActivity;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.utilities.MediaUtils;
+
+import java.io.File;
+import java.util.Date;
 
 /**
  * Widget that allows user to take pictures, sounds or video and add them to the
@@ -68,82 +67,24 @@ public class ImageWebViewWidget extends QuestionWidget implements IBinaryWidget 
 
     private TextView mErrorTextView;
 
-    private String constructImageElement() {
-        File f = new File(mInstanceFolder + File.separator + mBinaryName);
-
-        Display display = ((WindowManager) getContext().getSystemService(
-                Context.WINDOW_SERVICE)).getDefaultDisplay();
-        int screenWidth = display.getWidth();
-        // int screenHeight = display.getHeight();
-
-        String imgElement = f.exists() ? ("<img align=\"middle\" src=\"file:///"
-                + f.getAbsolutePath()
-                +
-                // Appending the time stamp to the filename is a hack to prevent
-                // caching.
-                "?"
-                + new Date().getTime()
-                + "\" width=\""
-                + Integer.toString(screenWidth - 10) + "\" >")
-                : "";
-
-        return imgElement;
-    }
-
-    public boolean suppressFlingGesture(MotionEvent e1, MotionEvent e2,
-                                        float velocityX, float velocityY) {
-        if (mImageDisplay == null
-                || mImageDisplay.getVisibility() != View.VISIBLE) {
-            return false;
-        }
-
-        Rect rect = new Rect();
-        mImageDisplay.getHitRect(rect);
-
-        // Log.i(t, "hitRect: " + rect.left + "," + rect.top + " : " +
-        // rect.right + "," + rect.bottom );
-        // Log.i(t, "e1 Raw, Clean: " + e1.getRawX() + "," + e1.getRawY() +
-        // " : " + e1.getX() + "," + e1.getY());
-        // Log.i(t, "e2 Raw, Clean: " + e2.getRawX() + "," + e2.getRawY() +
-        // " : " + e2.getX() + "," + e2.getY());
-
-        // starts in WebView
-        if (rect.contains((int) e1.getRawX(), (int) e1.getRawY())) {
-            return true;
-        }
-
-        // ends in WebView
-        if (rect.contains((int) e2.getRawX(), (int) e2.getRawY())) {
-            return true;
-        }
-
-        // transits WebView
-        if (rect.contains((int) ((e1.getRawX() + e2.getRawX()) / 2.0),
-                (int) ((e1.getRawY() + e2.getRawY()) / 2.0))) {
-            return true;
-        }
-        // Log.i(t, "NOT SUPPRESSED");
-        return false;
-    }
-
     public ImageWebViewWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
 
         mInstanceFolder = Collect.getInstance().getFormController()
                 .getInstancePath().getParent();
 
-        setOrientation(LinearLayout.VERTICAL);
+        setOrientation(VERTICAL);
 
         TableLayout.LayoutParams params = new TableLayout.LayoutParams();
         params.setMargins(7, 5, 7, 5);
 
         mErrorTextView = new TextView(context);
-        mErrorTextView.setId(QuestionWidget.newUniqueId());
+        mErrorTextView.setId(newUniqueId());
         mErrorTextView.setText("Selected file is not a valid image");
 
         // setup capture button
         mCaptureButton = new Button(getContext());
-        mCaptureButton.setId(QuestionWidget.newUniqueId());
+        mCaptureButton.setId(newUniqueId());
         mCaptureButton.setText(getContext().getString(R.string.capture_image));
         mCaptureButton
                 .setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
@@ -159,7 +100,7 @@ public class ImageWebViewWidget extends QuestionWidget implements IBinaryWidget 
                         .getActivityLogger()
                         .logInstanceAction(this, "captureButton", "click",
                                 mPrompt.getIndex());
-                mErrorTextView.setVisibility(View.GONE);
+                mErrorTextView.setVisibility(GONE);
                 Intent i = new Intent(
                         android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
                 // We give the camera an absolute filename/path where to put the
@@ -194,7 +135,7 @@ public class ImageWebViewWidget extends QuestionWidget implements IBinaryWidget 
 
         // setup chooser button
         mChooseButton = new Button(getContext());
-        mChooseButton.setId(QuestionWidget.newUniqueId());
+        mChooseButton.setId(newUniqueId());
         mChooseButton.setText(getContext().getString(R.string.choose_image));
         mChooseButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mChooseButton.setPadding(20, 20, 20, 20);
@@ -209,7 +150,7 @@ public class ImageWebViewWidget extends QuestionWidget implements IBinaryWidget 
                         .getActivityLogger()
                         .logInstanceAction(this, "chooseButton", "click",
                                 mPrompt.getIndex());
-                mErrorTextView.setVisibility(View.GONE);
+                mErrorTextView.setVisibility(GONE);
                 Intent i = new Intent(Intent.ACTION_GET_CONTENT);
                 i.setType("image/*");
 
@@ -237,10 +178,10 @@ public class ImageWebViewWidget extends QuestionWidget implements IBinaryWidget 
 
         // and hide the capture and choose button if read-only
         if (prompt.isReadOnly()) {
-            mCaptureButton.setVisibility(View.GONE);
-            mChooseButton.setVisibility(View.GONE);
+            mCaptureButton.setVisibility(GONE);
+            mChooseButton.setVisibility(GONE);
         }
-        mErrorTextView.setVisibility(View.GONE);
+        mErrorTextView.setVisibility(GONE);
 
         // retrieve answer from data model and update ui
         mBinaryName = prompt.getAnswerText();
@@ -248,12 +189,12 @@ public class ImageWebViewWidget extends QuestionWidget implements IBinaryWidget 
         // Only add the imageView if the user has taken a picture
         if (mBinaryName != null) {
             mImageDisplay = new WebView(getContext());
-            mImageDisplay.setId(QuestionWidget.newUniqueId());
+            mImageDisplay.setId(newUniqueId());
             mImageDisplay.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
             mImageDisplay.getSettings().setBuiltInZoomControls(true);
             mImageDisplay.getSettings().setDefaultZoom(
                     WebSettings.ZoomDensity.FAR);
-            mImageDisplay.setVisibility(View.VISIBLE);
+            mImageDisplay.setVisibility(VISIBLE);
             mImageDisplay.setLayoutParams(params);
 
             // HTML is used to display the image.
@@ -263,6 +204,64 @@ public class ImageWebViewWidget extends QuestionWidget implements IBinaryWidget 
                     + File.separator, html, "text/html", "utf-8", "");
             addView(mImageDisplay);
         }
+    }
+
+    private String constructImageElement() {
+        File f = new File(mInstanceFolder + File.separator + mBinaryName);
+
+        Display display = ((WindowManager) getContext().getSystemService(
+                Context.WINDOW_SERVICE)).getDefaultDisplay();
+        int screenWidth = display.getWidth();
+        // int screenHeight = display.getHeight();
+
+        String imgElement = f.exists() ? ("<img align=\"middle\" src=\"file:///"
+                + f.getAbsolutePath()
+                +
+                // Appending the time stamp to the filename is a hack to prevent
+                // caching.
+                "?"
+                + new Date().getTime()
+                + "\" width=\""
+                + Integer.toString(screenWidth - 10) + "\" >")
+                : "";
+
+        return imgElement;
+    }
+
+    public boolean suppressFlingGesture(MotionEvent e1, MotionEvent e2,
+                                        float velocityX, float velocityY) {
+        if (mImageDisplay == null
+                || mImageDisplay.getVisibility() != VISIBLE) {
+            return false;
+        }
+
+        Rect rect = new Rect();
+        mImageDisplay.getHitRect(rect);
+
+        // Log.i(t, "hitRect: " + rect.left + "," + rect.top + " : " +
+        // rect.right + "," + rect.bottom );
+        // Log.i(t, "e1 Raw, Clean: " + e1.getRawX() + "," + e1.getRawY() +
+        // " : " + e1.getX() + "," + e1.getY());
+        // Log.i(t, "e2 Raw, Clean: " + e2.getRawX() + "," + e2.getRawY() +
+        // " : " + e2.getX() + "," + e2.getY());
+
+        // starts in WebView
+        if (rect.contains((int) e1.getRawX(), (int) e1.getRawY())) {
+            return true;
+        }
+
+        // ends in WebView
+        if (rect.contains((int) e2.getRawX(), (int) e2.getRawY())) {
+            return true;
+        }
+
+        // transits WebView
+        if (rect.contains((int) ((e1.getRawX() + e2.getRawX()) / 2.0),
+                (int) ((e1.getRawY() + e2.getRawY()) / 2.0))) {
+            return true;
+        }
+        // Log.i(t, "NOT SUPPRESSED");
+        return false;
     }
 
     private void deleteMedia() {
@@ -286,10 +285,10 @@ public class ImageWebViewWidget extends QuestionWidget implements IBinaryWidget 
             mImageDisplay.loadDataWithBaseURL("file:///" + mInstanceFolder
                     + File.separator, html, "text/html", "utf-8", "");
 
-            mImageDisplay.setVisibility(View.INVISIBLE);
+            mImageDisplay.setVisibility(INVISIBLE);
         }
 
-        mErrorTextView.setVisibility(View.GONE);
+        mErrorTextView.setVisibility(GONE);
 
         // reset buttons
         mCaptureButton.setText(getContext().getString(R.string.capture_image));

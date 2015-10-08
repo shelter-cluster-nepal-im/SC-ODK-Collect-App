@@ -14,20 +14,20 @@
 
 package org.odk.collect.android.database;
 
-import java.io.File;
-import java.util.Calendar;
-import java.util.LinkedList;
-
-import org.javarosa.core.model.FormIndex;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.logic.FormController;
-
 import android.app.Activity;
 import android.content.ContentValues;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+
+import org.javarosa.core.model.FormIndex;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.logic.FormController;
+
+import java.io.File;
+import java.util.Calendar;
+import java.util.LinkedList;
 
 /**
  * Log all user interface activity into a SQLite database. Logging is disabled by default.
@@ -41,25 +41,6 @@ import android.database.sqlite.SQLiteException;
  */
 public final class ActivityLogger {
 
-    private static class DatabaseHelper extends ODKSQLiteOpenHelper {
-
-        DatabaseHelper() {
-            super(Collect.LOG_PATH, DATABASE_NAME, null, DATABASE_VERSION);
-            new File(Collect.LOG_PATH).mkdirs();
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            db.execSQL(DATABASE_CREATE);
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
-            onCreate(db);
-        }
-    }
-
     /**
      * The minimum delay, in milliseconds, for a scroll action to be considered new.
      */
@@ -69,7 +50,6 @@ public final class ActivityLogger {
      * it will be flushed.
      */
     private static final int MAX_SCROLL_ACTION_BUFFER_SIZE = 8;
-
     private static final String DATABASE_TABLE = "log";
     private static final String ENABLE_LOGGING = "enabled";
     private static final int DATABASE_VERSION = 1;
@@ -85,7 +65,6 @@ public final class ActivityLogger {
     private static final String QUESTION = "question";
     private static final String PARAM1 = "param1";
     private static final String PARAM2 = "param2";
-
     private static final String DATABASE_CREATE =
             "create table " + DATABASE_TABLE + " (" +
                     ID + " integer primary key autoincrement, " +
@@ -98,7 +77,6 @@ public final class ActivityLogger {
                     QUESTION + " text, " +
                     PARAM1 + " text, " +
                     PARAM2 + " text);";
-
     private final boolean mLoggingEnabled;
     private final String mDeviceId;
     private DatabaseHelper mDbHelper = null;
@@ -108,6 +86,10 @@ public final class ActivityLogger {
     // during scrolling.  This list is flushed every time any other type of
     // action is logged.
     private LinkedList<ContentValues> mScrollActions = new LinkedList<ContentValues>();
+    // cached to improve logging performance...
+    // only access these through getXPath(FormIndex index);
+    private FormIndex cachedXPathIndex = null;
+    private String cachedXPathValue = null;
 
     public ActivityLogger(String deviceId) {
         this.mDeviceId = deviceId;
@@ -131,11 +113,6 @@ public final class ActivityLogger {
         }
     }
 
-    // cached to improve logging performance...
-    // only access these through getXPath(FormIndex index);
-    private FormIndex cachedXPathIndex = null;
-    private String cachedXPathValue = null;
-
     // DO NOT CALL THIS OUTSIDE OF synchronized(mScrollActions) !!!!
     // DO NOT CALL THIS OUTSIDE OF synchronized(mScrollActions) !!!!
     // DO NOT CALL THIS OUTSIDE OF synchronized(mScrollActions) !!!!
@@ -147,7 +124,6 @@ public final class ActivityLogger {
         cachedXPathValue = Collect.getInstance().getFormController().getXPath(index);
         return cachedXPathValue;
     }
-
 
     private void log(String object, String context, String action, String instancePath, FormIndex index, String param1, String param2) {
         if (!isOpen()) return;
@@ -233,11 +209,11 @@ public final class ActivityLogger {
         }
     }
 
-    // Convenience methods
-
     public void logOnStart(Activity a) {
         log(a.getClass().getName(), "onStart", null, null, null, null, null);
     }
+
+    // Convenience methods
 
     public void logOnStop(Activity a) {
         log(a.getClass().getName(), "onStop", null, null, null, null, null);
@@ -273,5 +249,24 @@ public final class ActivityLogger {
             instancePath = formController.getInstancePath().getAbsolutePath();
         }
         log(t.getClass().getName(), context, action, instancePath, index, null, null);
+    }
+
+    private static class DatabaseHelper extends ODKSQLiteOpenHelper {
+
+        DatabaseHelper() {
+            super(Collect.LOG_PATH, DATABASE_NAME, null, DATABASE_VERSION);
+            new File(Collect.LOG_PATH).mkdirs();
+        }
+
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL(DATABASE_CREATE);
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE);
+            onCreate(db);
+        }
     }
 }

@@ -14,12 +14,7 @@
 
 package org.odk.collect.android.logic;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
+import android.util.Log;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.FormIndex;
@@ -48,7 +43,12 @@ import org.javarosa.xpath.expr.XPathExpression;
 import org.odk.collect.android.exception.JavaRosaException;
 import org.odk.collect.android.views.ODKView;
 
-import android.util.Log;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * This class is a wrapper for Javarosa's FormEntryController. In theory, if you wanted to replace
@@ -60,35 +60,14 @@ import android.util.Log;
  */
 public class FormController {
 
-    private static final String t = "FormController";
-
     public static final boolean STEP_INTO_GROUP = true;
     public static final boolean STEP_OVER_GROUP = false;
-
+    private static final String t = "FormController";
     /**
      * OpenRosa metadata tag names.
      */
     private static final String INSTANCE_ID = "instanceID";
     private static final String INSTANCE_NAME = "instanceName";
-
-    /**
-     * OpenRosa metadata of a form instance.
-     * <p>
-     * Contains the values for the required metadata
-     * fields and nothing else.
-     *
-     * @author mitchellsundt@gmail.com
-     */
-    public static final class InstanceMetadata {
-        public final String instanceId;
-        public final String instanceName;
-
-        InstanceMetadata(String instanceId, String instanceName) {
-            this.instanceId = instanceId;
-            this.instanceName = instanceName;
-        }
-    }
-
     /**
      * Classes needed to serialize objects. Need to put anything from JR in here.
      */
@@ -120,8 +99,16 @@ public class FormController {
             "org.javarosa.core.model.Action", // CoreModelModule
             "org.javarosa.core.model.actions.SetValueAction" // CoreModelModule
     };
-
     private static boolean isJavaRosaInitialized = false;
+    private File mMediaFolder;
+    private File mInstancePath;
+    private FormEntryController mFormEntryController;
+    private FormIndex mIndexWaitingForData = null;
+    public FormController(File mediaFolder, FormEntryController fec, File instancePath) {
+        mMediaFolder = mediaFolder;
+        mFormEntryController = fec;
+        mInstancePath = instancePath;
+    }
 
     /**
      * Isolate the initialization of JavaRosa into one method, called first
@@ -149,17 +136,6 @@ public class FormController {
                 .setPropertyManager(mgr);
     }
 
-    private File mMediaFolder;
-    private File mInstancePath;
-    private FormEntryController mFormEntryController;
-    private FormIndex mIndexWaitingForData = null;
-
-    public FormController(File mediaFolder, FormEntryController fec, File instancePath) {
-        mMediaFolder = mediaFolder;
-        mFormEntryController = fec;
-        mInstancePath = instancePath;
-    }
-
     public FormDef getFormDef() {
         return mFormEntryController.getModel().getForm();
     }
@@ -176,12 +152,12 @@ public class FormController {
         mInstancePath = instancePath;
     }
 
-    public void setIndexWaitingForData(FormIndex index) {
-        mIndexWaitingForData = index;
-    }
-
     public FormIndex getIndexWaitingForData() {
         return mIndexWaitingForData;
+    }
+
+    public void setIndexWaitingForData(FormIndex index) {
+        mIndexWaitingForData = index;
     }
 
     /**
@@ -262,7 +238,6 @@ public class FormController {
         return mFormEntryController.getModel().getEvent();
     }
 
-
     /**
      * returns the event for the given FormIndex.
      *
@@ -273,14 +248,12 @@ public class FormController {
         return mFormEntryController.getModel().getEvent(index);
     }
 
-
     /**
      * @return current FormIndex.
      */
     public FormIndex getFormIndex() {
         return mFormEntryController.getModel().getFormIndex();
     }
-
 
     /**
      * Return the langauges supported by the currently loaded form.
@@ -291,7 +264,6 @@ public class FormController {
         return mFormEntryController.getModel().getLanguages();
     }
 
-
     /**
      * @return A String containing the title of the current form.
      */
@@ -299,12 +271,20 @@ public class FormController {
         return mFormEntryController.getModel().getFormTitle();
     }
 
-
     /**
      * @return the currently selected language.
      */
     public String getLanguage() {
         return mFormEntryController.getModel().getLanguage();
+    }
+
+    /**
+     * Sets the current language.
+     *
+     * @param language
+     */
+    public void setLanguage(String language) {
+        mFormEntryController.setLanguage(language);
     }
 
     public String getBindAttribute(String attributeNamespace, String attributeName) {
@@ -701,17 +681,6 @@ public class FormController {
         return getEvent();
     }
 
-
-    public static class FailedConstraint {
-        public final FormIndex index;
-        public final int status;
-
-        FailedConstraint(FormIndex index, int status) {
-            this.index = index;
-            this.status = status;
-        }
-    }
-
     /**
      * @param answers
      * @param evaluateConstraints
@@ -743,7 +712,6 @@ public class FormController {
         }
         return null;
     }
-
 
     /**
      * Navigates backward in the form.
@@ -804,7 +772,6 @@ public class FormController {
 
     }
 
-
     /**
      * Jumps to a given FormIndex.
      *
@@ -815,7 +782,6 @@ public class FormController {
         return mFormEntryController.jumpToIndex(index);
     }
 
-
     /**
      * Creates a new repeated instance of the group referenced by the current FormIndex.
      *
@@ -824,7 +790,6 @@ public class FormController {
     public void newRepeat() {
         mFormEntryController.newRepeat();
     }
-
 
     /**
      * If the current FormIndex is within a repeated group, will find the innermost repeat, delete
@@ -835,17 +800,6 @@ public class FormController {
         FormIndex fi = mFormEntryController.deleteRepeat();
         mFormEntryController.jumpToIndex(fi);
     }
-
-
-    /**
-     * Sets the current language.
-     *
-     * @param language
-     */
-    public void setLanguage(String language) {
-        mFormEntryController.setLanguage(language);
-    }
-
 
     /**
      * Returns an array of question promps.
@@ -918,11 +872,9 @@ public class FormController {
         return questions;
     }
 
-
     public FormEntryPrompt getQuestionPrompt(FormIndex index) {
         return mFormEntryController.getModel().getQuestionPrompt(index);
     }
-
 
     public FormEntryPrompt getQuestionPrompt() {
         return mFormEntryController.getModel().getQuestionPrompt();
@@ -997,7 +949,6 @@ public class FormController {
         return groups;
     }
 
-
     /**
      * This is used to enable/disable the "Delete Repeat" menu option.
      *
@@ -1015,7 +966,6 @@ public class FormController {
         return false;
     }
 
-
     /**
      * The count of the closest group that repeats or -1.
      */
@@ -1031,7 +981,6 @@ public class FormController {
         }
         return -1;
     }
-
 
     /**
      * The name of the closest group that repeats or null.
@@ -1049,7 +998,6 @@ public class FormController {
         return null;
     }
 
-
     /**
      * The closest group the prompt belongs to.
      *
@@ -1063,7 +1011,6 @@ public class FormController {
             return groups[groups.length - 1];
     }
 
-
     /**
      * The repeat count of closest group the prompt belongs to.
      */
@@ -1074,7 +1021,6 @@ public class FormController {
         return -1;
 
     }
-
 
     /**
      * The text of closest group the prompt belongs to.
@@ -1222,6 +1168,34 @@ public class FormController {
         }
 
         return new InstanceMetadata(instanceId, instanceName);
+    }
+
+    /**
+     * OpenRosa metadata of a form instance.
+     * <p>
+     * Contains the values for the required metadata
+     * fields and nothing else.
+     *
+     * @author mitchellsundt@gmail.com
+     */
+    public static final class InstanceMetadata {
+        public final String instanceId;
+        public final String instanceName;
+
+        InstanceMetadata(String instanceId, String instanceName) {
+            this.instanceId = instanceId;
+            this.instanceName = instanceName;
+        }
+    }
+
+    public static class FailedConstraint {
+        public final FormIndex index;
+        public final int status;
+
+        FailedConstraint(FormIndex index, int status) {
+            this.index = index;
+            this.status = status;
+        }
     }
 
 }

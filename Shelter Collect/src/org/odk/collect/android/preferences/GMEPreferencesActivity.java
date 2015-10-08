@@ -14,23 +14,6 @@
 
 package org.odk.collect.android.preferences;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.InstanceUploaderListener;
-import org.odk.collect.android.tasks.GoogleMapsEngineTask;
-import org.odk.collect.android.views.DynamicListPreference;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
@@ -41,7 +24,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -58,6 +40,23 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.InstanceUploaderListener;
+import org.odk.collect.android.tasks.GoogleMapsEngineTask;
+import org.odk.collect.android.views.DynamicListPreference;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
+
 
 /**
  * Handles GME specific preferences.
@@ -67,18 +66,13 @@ import com.google.gson.GsonBuilder;
 public class GMEPreferencesActivity extends PreferenceActivity implements
         InstanceUploaderListener {
 
-    private DynamicListPreference mGMEProjectIDPreference;
-
-    private static String GME_ERROR = "gme_error";
-
-    private boolean partnerListDialogShowing;
-
     private final static int PROGRESS_DIALOG = 1;
     private final static int GOOGLE_USER_DIALOG = 3;
-
     private static final String ALERT_MSG = "alertmsg";
     private static final String ALERT_SHOWING = "alertshowing";
-
+    private static String GME_ERROR = "gme_error";
+    private DynamicListPreference mGMEProjectIDPreference;
+    private boolean partnerListDialogShowing;
     private ProgressDialog mProgressDialog;
     private AlertDialog mAlertDialog;
 
@@ -263,121 +257,6 @@ public class GMEPreferencesActivity extends PreferenceActivity implements
         }
     }
 
-    private class GetProjectIDTask extends
-            GoogleMapsEngineTask<Void, Void, HashMap<String, String>> {
-
-        private InstanceUploaderListener mStateListener;
-        private String mGoogleUserName;
-
-        @Override
-        protected HashMap<String, String> doInBackground(Void... values) {
-            HashMap<String, String> projectList = new HashMap<String, String>();
-
-            String token = null;
-            try {
-                token = authenticate(GMEPreferencesActivity.this,
-                        mGoogleUserName);
-            } catch (IOException e) {
-                // network or server error, the call is expected to succeed if
-                // you try again later. Don't attempt to call again immediately
-                // - the request is likely to fail, you'll hit quotas or
-                // back-off.
-                e.printStackTrace();
-                return null;
-            } catch (GooglePlayServicesAvailabilityException playEx) {
-                Dialog alert = GooglePlayServicesUtil.getErrorDialog(
-                        playEx.getConnectionStatusCode(),
-                        GMEPreferencesActivity.this, PLAYSTORE_REQUEST_CODE);
-                alert.show();
-                return null;
-            } catch (UserRecoverableAuthException e) {
-                GMEPreferencesActivity.this.startActivityForResult(
-                        e.getIntent(), USER_RECOVERABLE_REQUEST_CODE);
-                e.printStackTrace();
-                return null;
-            } catch (GoogleAuthException e) {
-                // Failure. The call is not expected to ever succeed so it
-                // should not be retried.
-                e.printStackTrace();
-                return null;
-            }
-
-            if (token == null) {
-                // if token is null,
-                return null;
-            }
-
-            HttpURLConnection conn = null;
-            int status = -1;
-            try {
-                URL url = new URL(
-                        "https://www.googleapis.com/mapsengine/v1/projects/");
-
-                conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("GET");
-                conn.addRequestProperty("Authorization", "OAuth " + token);
-
-                conn.connect();
-                // try {
-                if (conn.getResponseCode() / 100 == 2) {
-                    BufferedReader br = new BufferedReader(
-                            new InputStreamReader(conn.getInputStream()));
-                    GsonBuilder builder = new GsonBuilder();
-                    Gson gson = builder.create();
-
-                    ProjectsListResponse projects = gson.fromJson(br,
-                            ProjectsListResponse.class);
-                    for (int i = 0; i < projects.projects.length; i++) {
-                        Project p = projects.projects[i];
-                        projectList.put(p.name, p.id);
-                    }
-                } else {
-                    String errorMessage = getErrorMesssage(conn
-                            .getErrorStream());
-                    if (status == 400) {
-                    } else if (status == 403 || status == 401) {
-                        GoogleAuthUtil.invalidateToken(
-                                GMEPreferencesActivity.this, token);
-                    }
-                    projectList.put(GME_ERROR, errorMessage);
-                    return projectList;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                GoogleAuthUtil.invalidateToken(GMEPreferencesActivity.this,
-                        token);
-                String errorMessage = getErrorMesssage(conn.getErrorStream());
-                projectList.put(GME_ERROR, errorMessage);
-                return projectList;
-            } finally {
-                if (conn != null) {
-                    conn.disconnect();
-                }
-            }
-            return projectList;
-        }
-
-        public void setUserName(String username) {
-            mGoogleUserName = username;
-        }
-
-        @Override
-        protected void onPostExecute(HashMap<String, String> results) {
-            synchronized (this) {
-                if (mStateListener != null) {
-                    mStateListener.uploadingComplete(results);
-                }
-            }
-        }
-
-        public void setUploaderListener(InstanceUploaderListener sl) {
-            synchronized (this) {
-                mStateListener = sl;
-            }
-        }
-
-    }
-
     @Override
     public void uploadingComplete(HashMap<String, String> result) {
         try {
@@ -523,6 +402,121 @@ public class GMEPreferencesActivity extends PreferenceActivity implements
 
     public static class ProjectsListResponse {
         public Project[] projects;
+    }
+
+    private class GetProjectIDTask extends
+            GoogleMapsEngineTask<Void, Void, HashMap<String, String>> {
+
+        private InstanceUploaderListener mStateListener;
+        private String mGoogleUserName;
+
+        @Override
+        protected HashMap<String, String> doInBackground(Void... values) {
+            HashMap<String, String> projectList = new HashMap<String, String>();
+
+            String token = null;
+            try {
+                token = authenticate(GMEPreferencesActivity.this,
+                        mGoogleUserName);
+            } catch (IOException e) {
+                // network or server error, the call is expected to succeed if
+                // you try again later. Don't attempt to call again immediately
+                // - the request is likely to fail, you'll hit quotas or
+                // back-off.
+                e.printStackTrace();
+                return null;
+            } catch (GooglePlayServicesAvailabilityException playEx) {
+                Dialog alert = GooglePlayServicesUtil.getErrorDialog(
+                        playEx.getConnectionStatusCode(),
+                        GMEPreferencesActivity.this, PLAYSTORE_REQUEST_CODE);
+                alert.show();
+                return null;
+            } catch (UserRecoverableAuthException e) {
+                GMEPreferencesActivity.this.startActivityForResult(
+                        e.getIntent(), USER_RECOVERABLE_REQUEST_CODE);
+                e.printStackTrace();
+                return null;
+            } catch (GoogleAuthException e) {
+                // Failure. The call is not expected to ever succeed so it
+                // should not be retried.
+                e.printStackTrace();
+                return null;
+            }
+
+            if (token == null) {
+                // if token is null,
+                return null;
+            }
+
+            HttpURLConnection conn = null;
+            int status = -1;
+            try {
+                URL url = new URL(
+                        "https://www.googleapis.com/mapsengine/v1/projects/");
+
+                conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("GET");
+                conn.addRequestProperty("Authorization", "OAuth " + token);
+
+                conn.connect();
+                // try {
+                if (conn.getResponseCode() / 100 == 2) {
+                    BufferedReader br = new BufferedReader(
+                            new InputStreamReader(conn.getInputStream()));
+                    GsonBuilder builder = new GsonBuilder();
+                    Gson gson = builder.create();
+
+                    ProjectsListResponse projects = gson.fromJson(br,
+                            ProjectsListResponse.class);
+                    for (int i = 0; i < projects.projects.length; i++) {
+                        Project p = projects.projects[i];
+                        projectList.put(p.name, p.id);
+                    }
+                } else {
+                    String errorMessage = getErrorMesssage(conn
+                            .getErrorStream());
+                    if (status == 400) {
+                    } else if (status == 403 || status == 401) {
+                        GoogleAuthUtil.invalidateToken(
+                                GMEPreferencesActivity.this, token);
+                    }
+                    projectList.put(GME_ERROR, errorMessage);
+                    return projectList;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                GoogleAuthUtil.invalidateToken(GMEPreferencesActivity.this,
+                        token);
+                String errorMessage = getErrorMesssage(conn.getErrorStream());
+                projectList.put(GME_ERROR, errorMessage);
+                return projectList;
+            } finally {
+                if (conn != null) {
+                    conn.disconnect();
+                }
+            }
+            return projectList;
+        }
+
+        public void setUserName(String username) {
+            mGoogleUserName = username;
+        }
+
+        @Override
+        protected void onPostExecute(HashMap<String, String> results) {
+            synchronized (this) {
+                if (mStateListener != null) {
+                    mStateListener.uploadingComplete(results);
+                }
+            }
+        }
+
+        public void setUploaderListener(InstanceUploaderListener sl) {
+            synchronized (this) {
+                mStateListener = sl;
+            }
+        }
+
     }
 
 }

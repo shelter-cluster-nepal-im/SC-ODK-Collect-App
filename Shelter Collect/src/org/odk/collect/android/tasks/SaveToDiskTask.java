@@ -14,10 +14,11 @@
 
 package org.odk.collect.android.tasks;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.util.Log;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.services.transport.payload.ByteArrayPayload;
@@ -27,18 +28,15 @@ import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.exception.EncryptionException;
 import org.odk.collect.android.listeners.FormSavedListener;
 import org.odk.collect.android.logic.FormController;
-import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
+import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
 import org.odk.collect.android.utilities.EncryptionUtils;
-import org.odk.collect.android.utilities.EncryptionUtils.EncryptedFormInformation;
 import org.odk.collect.android.utilities.FileUtils;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.util.Log;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.RandomAccessFile;
 
 /**
  * Background task for loading a form.
@@ -47,19 +45,17 @@ import android.util.Log;
  * @author Yaw Anokwa (yanokwa@gmail.com)
  */
 public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
-    private final static String t = "SaveToDiskTask";
-
-    private FormSavedListener mSavedListener;
-    private Boolean mSave;
-    private Boolean mMarkCompleted;
-    private Uri mUri;
-    private String mInstanceName;
-
     public static final int SAVED = 500;
     public static final int SAVE_ERROR = 501;
     public static final int VALIDATE_ERROR = 502;
     public static final int VALIDATED = 503;
     public static final int SAVED_AND_EXIT = 504;
+    private final static String t = "SaveToDiskTask";
+    private FormSavedListener mSavedListener;
+    private Boolean mSave;
+    private Boolean mMarkCompleted;
+    private Uri mUri;
+    private String mInstanceName;
 
 
     public SaveToDiskTask(Uri uri, Boolean saveAndExit, Boolean markCompleted, String updatedName) {
@@ -69,6 +65,64 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
         mInstanceName = updatedName;
     }
 
+    /**
+     * Return the name of the savepoint file for a given instance.
+     *
+     * @param instancePath
+     * @return
+     */
+    public static File savepointFile(File instancePath) {
+        File tempDir = new File(Collect.CACHE_PATH);
+        return new File(tempDir, instancePath.getName() + ".save");
+    }
+
+    /**
+     * This method actually writes the xml to disk.
+     *
+     * @param payload
+     * @param path
+     * @return
+     */
+    static void exportXmlFile(ByteArrayPayload payload, String path) throws IOException {
+        File file = new File(path);
+        if (file.exists() && !file.delete()) {
+            throw new IOException("Cannot overwrite " + path + ". Perhaps the file is locked?");
+        }
+
+        // create data stream
+        InputStream is = payload.getPayloadStream();
+        int len = (int) payload.getLength();
+
+        // read from data stream
+        byte[] data = new byte[len];
+//        try {
+        int read = is.read(data, 0, len);
+        if (read > 0) {
+            // write xml file
+            RandomAccessFile randomAccessFile = null;
+            try {
+                // String filename = path + File.separator +
+                // path.substring(path.lastIndexOf(File.separator) + 1) + ".xml";
+                randomAccessFile = new RandomAccessFile(file, "rws");
+                randomAccessFile.write(data);
+            } finally {
+                if (randomAccessFile != null) {
+                    try {
+                        randomAccessFile.close();
+                    } catch (IOException e) {
+                        Log.e(t, "Error closing RandomAccessFile: " + path, e);
+                    }
+                }
+            }
+        }
+//        } catch (IOException e) {
+//            Log.e(t, "Error reading from payload data stream");
+//            e.printStackTrace();
+//            return false;
+//        }
+//
+//        return false;
+    }
 
     /**
      * Initialize {@link FormEntryController} with {@link FormDef} from binary or from XML. If given
@@ -148,18 +202,18 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
         // Update the instance database...
         ContentValues values = new ContentValues();
         if (mInstanceName != null) {
-            values.put(InstanceColumns.DISPLAY_NAME, mInstanceName);
+            values.put(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME, mInstanceName);
         }
         if (incomplete || !mMarkCompleted) {
-            values.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_INCOMPLETE);
+            values.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_INCOMPLETE);
         } else {
-            values.put(InstanceColumns.STATUS, InstanceProviderAPI.STATUS_COMPLETE);
+            values.put(InstanceProviderAPI.InstanceColumns.STATUS, InstanceProviderAPI.STATUS_COMPLETE);
         }
         // update this whether or not the status is complete...
-        values.put(InstanceColumns.CAN_EDIT_WHEN_COMPLETE, Boolean.toString(canEditAfterCompleted));
+        values.put(InstanceProviderAPI.InstanceColumns.CAN_EDIT_WHEN_COMPLETE, Boolean.toString(canEditAfterCompleted));
 
         // If FormEntryActivity was started with an Instance, just update that instance
-        if (Collect.getInstance().getContentResolver().getType(mUri).equals(InstanceColumns.CONTENT_ITEM_TYPE)) {
+        if (Collect.getInstance().getContentResolver().getType(mUri).equals(InstanceProviderAPI.InstanceColumns.CONTENT_ITEM_TYPE)) {
             int updated = Collect.getInstance().getContentResolver().update(mUri, values, null, null);
             if (updated > 1) {
                 Log.w(t, "Updated more than one entry, that's not good: " + mUri.toString());
@@ -168,20 +222,20 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
             } else {
                 Log.e(t, "Instance doesn't exist but we have its Uri!! " + mUri.toString());
             }
-        } else if (Collect.getInstance().getContentResolver().getType(mUri).equals(FormsColumns.CONTENT_ITEM_TYPE)) {
+        } else if (Collect.getInstance().getContentResolver().getType(mUri).equals(FormsProviderAPI.FormsColumns.CONTENT_ITEM_TYPE)) {
             // If FormEntryActivity was started with a form, then it's likely the first time we're
             // saving.
             // However, it could be a not-first time saving if the user has been using the manual
             // 'save data' option from the menu. So try to update first, then make a new one if that
             // fails.
             String instancePath = formController.getInstancePath().getAbsolutePath();
-            String where = InstanceColumns.INSTANCE_FILE_PATH + "=?";
+            String where = InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH + "=?";
             String[] whereArgs = {
                     instancePath
             };
             int updated =
                     Collect.getInstance().getContentResolver()
-                            .update(InstanceColumns.CONTENT_URI, values, where, whereArgs);
+                            .update(InstanceProviderAPI.InstanceColumns.CONTENT_URI, values, where, whereArgs);
             if (updated > 1) {
                 Log.w(t, "Updated more than one entry, that's not good: " + instancePath);
             } else if (updated == 1) {
@@ -195,44 +249,33 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
                     // retrieve the form definition...
                     c = Collect.getInstance().getContentResolver().query(mUri, null, null, null, null);
                     c.moveToFirst();
-                    String jrformid = c.getString(c.getColumnIndex(FormsColumns.JR_FORM_ID));
-                    String jrversion = c.getString(c.getColumnIndex(FormsColumns.JR_VERSION));
-                    String formname = c.getString(c.getColumnIndex(FormsColumns.DISPLAY_NAME));
+                    String jrformid = c.getString(c.getColumnIndex(FormsProviderAPI.FormsColumns.JR_FORM_ID));
+                    String jrversion = c.getString(c.getColumnIndex(FormsProviderAPI.FormsColumns.JR_VERSION));
+                    String formname = c.getString(c.getColumnIndex(FormsProviderAPI.FormsColumns.DISPLAY_NAME));
                     String submissionUri = null;
-                    if (!c.isNull(c.getColumnIndex(FormsColumns.SUBMISSION_URI))) {
-                        submissionUri = c.getString(c.getColumnIndex(FormsColumns.SUBMISSION_URI));
+                    if (!c.isNull(c.getColumnIndex(FormsProviderAPI.FormsColumns.SUBMISSION_URI))) {
+                        submissionUri = c.getString(c.getColumnIndex(FormsProviderAPI.FormsColumns.SUBMISSION_URI));
                     }
 
                     // add missing fields into values
-                    values.put(InstanceColumns.INSTANCE_FILE_PATH, instancePath);
-                    values.put(InstanceColumns.SUBMISSION_URI, submissionUri);
+                    values.put(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH, instancePath);
+                    values.put(InstanceProviderAPI.InstanceColumns.SUBMISSION_URI, submissionUri);
                     if (mInstanceName != null) {
-                        values.put(InstanceColumns.DISPLAY_NAME, mInstanceName);
+                        values.put(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME, mInstanceName);
                     } else {
-                        values.put(InstanceColumns.DISPLAY_NAME, formname);
+                        values.put(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME, formname);
                     }
-                    values.put(InstanceColumns.JR_FORM_ID, jrformid);
-                    values.put(InstanceColumns.JR_VERSION, jrversion);
+                    values.put(InstanceProviderAPI.InstanceColumns.JR_FORM_ID, jrformid);
+                    values.put(InstanceProviderAPI.InstanceColumns.JR_VERSION, jrversion);
                 } finally {
                     if (c != null) {
                         c.close();
                     }
                 }
                 mUri = Collect.getInstance().getContentResolver()
-                        .insert(InstanceColumns.CONTENT_URI, values);
+                        .insert(InstanceProviderAPI.InstanceColumns.CONTENT_URI, values);
             }
         }
-    }
-
-    /**
-     * Return the name of the savepoint file for a given instance.
-     *
-     * @param instancePath
-     * @return
-     */
-    public static File savepointFile(File instancePath) {
-        File tempDir = new File(Collect.CACHE_PATH);
-        return new File(tempDir, instancePath.getName() + ".save");
     }
 
     /**
@@ -284,7 +327,7 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
             exportXmlFile(payload, submissionXml.getAbsolutePath());
 
             // see if the form is encrypted and we can encrypt it...
-            EncryptedFormInformation formInfo = EncryptionUtils.getEncryptedFormInformation(mUri,
+            EncryptionUtils.EncryptedFormInformation formInfo = EncryptionUtils.getEncryptedFormInformation(mUri,
                     formController.getSubmissionMetadata());
             if (formInfo != null) {
                 // if we are encrypting, the form cannot be reopened afterward
@@ -353,55 +396,6 @@ public class SaveToDiskTask extends AsyncTask<Void, String, SaveResult> {
                 }
             }
         }
-    }
-
-
-    /**
-     * This method actually writes the xml to disk.
-     *
-     * @param payload
-     * @param path
-     * @return
-     */
-    static void exportXmlFile(ByteArrayPayload payload, String path) throws IOException {
-        File file = new File(path);
-        if (file.exists() && !file.delete()) {
-            throw new IOException("Cannot overwrite " + path + ". Perhaps the file is locked?");
-        }
-
-        // create data stream
-        InputStream is = payload.getPayloadStream();
-        int len = (int) payload.getLength();
-
-        // read from data stream
-        byte[] data = new byte[len];
-//        try {
-        int read = is.read(data, 0, len);
-        if (read > 0) {
-            // write xml file
-            RandomAccessFile randomAccessFile = null;
-            try {
-                // String filename = path + File.separator +
-                // path.substring(path.lastIndexOf(File.separator) + 1) + ".xml";
-                randomAccessFile = new RandomAccessFile(file, "rws");
-                randomAccessFile.write(data);
-            } finally {
-                if (randomAccessFile != null) {
-                    try {
-                        randomAccessFile.close();
-                    } catch (IOException e) {
-                        Log.e(t, "Error closing RandomAccessFile: " + path, e);
-                    }
-                }
-            }
-        }
-//        } catch (IOException e) {
-//            Log.e(t, "Error reading from payload data stream");
-//            e.printStackTrace();
-//            return false;
-//        }
-//
-//        return false;
     }
 
     @Override

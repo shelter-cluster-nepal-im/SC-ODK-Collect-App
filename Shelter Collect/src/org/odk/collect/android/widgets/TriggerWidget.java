@@ -14,20 +14,19 @@
 
 package org.odk.collect.android.widgets;
 
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-
 import android.content.Context;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
 
 /**
  * Widget that allows user to scan barcodes and add them to the form.
@@ -36,26 +35,20 @@ import android.widget.TextView;
  */
 public class TriggerWidget extends QuestionWidget {
 
+    private static final String mOK = "OK";
     private CheckBox mTriggerButton;
     private TextView mStringAnswer;
-    private static final String mOK = "OK";
-
     private FormEntryPrompt mPrompt;
-
-
-    public FormEntryPrompt getPrompt() {
-        return mPrompt;
-    }
 
 
     public TriggerWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
         mPrompt = prompt;
 
-        this.setOrientation(LinearLayout.VERTICAL);
+        this.setOrientation(VERTICAL);
 
         mTriggerButton = new CheckBox(getContext());
-        mTriggerButton.setId(QuestionWidget.newUniqueId());
+        mTriggerButton.setId(newUniqueId());
         mTriggerButton.setText(getContext().getString(R.string.trigger));
         mTriggerButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         // mActionButton.setPadding(20, 20, 20, 20);
@@ -77,7 +70,7 @@ public class TriggerWidget extends QuestionWidget {
         });
 
         mStringAnswer = new TextView(getContext());
-        mStringAnswer.setId(QuestionWidget.newUniqueId());
+        mStringAnswer.setId(newUniqueId());
         mStringAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mStringAnswer.setGravity(Gravity.CENTER);
 
@@ -97,6 +90,9 @@ public class TriggerWidget extends QuestionWidget {
         // this.addView(mStringAnswer);
     }
 
+    public FormEntryPrompt getPrompt() {
+        return mPrompt;
+    }
 
     @Override
     public void clearAnswer() {

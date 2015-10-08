@@ -14,6 +14,39 @@
 
 package org.odk.collect.android.tasks;
 
+import android.content.ContentValues;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
+import android.preference.PreferenceManager;
+import android.provider.MediaStore.Images;
+import android.util.Log;
+import android.util.Xml;
+
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.InputStreamContent;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.exception.FormException;
+import org.odk.collect.android.exception.GeoPointNotFoundException;
+import org.odk.collect.android.picasa.AlbumEntry;
+import org.odk.collect.android.picasa.AlbumFeed;
+import org.odk.collect.android.picasa.PhotoEntry;
+import org.odk.collect.android.picasa.PicasaClient;
+import org.odk.collect.android.picasa.PicasaUrl;
+import org.odk.collect.android.picasa.UserFeed;
+import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.provider.FormsProviderAPI;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,55 +67,19 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.exception.FormException;
-import org.odk.collect.android.exception.GeoPointNotFoundException;
-import org.odk.collect.android.picasa.AlbumEntry;
-import org.odk.collect.android.picasa.AlbumFeed;
-import org.odk.collect.android.picasa.PhotoEntry;
-import org.odk.collect.android.picasa.PicasaClient;
-import org.odk.collect.android.picasa.PicasaUrl;
-import org.odk.collect.android.picasa.UserFeed;
-import org.odk.collect.android.preferences.PreferencesActivity;
-import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
-import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-
-import android.content.ContentValues;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.provider.MediaStore.Images;
-import android.util.Log;
-import android.util.Xml;
-
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.InputStreamContent;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 /**
  * @author carlhartung (chartung@nafundi.com)
  */
 public abstract class GoogleMapsEngineAbstractUploader<Params, Progress, Result>
         extends GoogleMapsEngineTask<Long, Integer, HashMap<String, String>> {
 
-    private final static String tag = "GoogleMapsEngineInstanceUploaderTask";
-
-    protected HashMap<String, String> mResults;
-
     protected static final String picasa_fail = "Picasa Error: ";
     protected static final String oauth_fail = "OAUTH Error: ";
     protected static final String form_fail = "Form Error: ";
-
+    private final static String tag = "GoogleMapsEngineInstanceUploaderTask";
     private final static String PROJECT_ID = "projectid";
+    // prod
+    private static final int GME_SLEEP_TIME = 1;
 
 	/*
      * By default, GME has a rate limit of 1 request/sec, so we've added GME_SLEEP_TIME
@@ -93,16 +90,13 @@ public abstract class GoogleMapsEngineAbstractUploader<Params, Progress, Result>
 	 */
     // dev
     //private static final int GME_SLEEP_TIME = 1100;
-
-    // prod
-    private static final int GME_SLEEP_TIME = 1;
-
     // As of August 2014 there was a known issue in GME that returns an error
     // if a request comes in too soon after creating a table.
     // This delay prevents that error
     // see "known issues at the bottom of this page:
     // https://developers.google.com/maps-engine/documentation/table-create
     private static final int GME_CREATE_TABLE_DELAY = 4000;
+    protected HashMap<String, String> mResults;
 
     /**
      * @param selection
@@ -120,7 +114,7 @@ public abstract class GoogleMapsEngineAbstractUploader<Params, Progress, Result>
             c = Collect
                     .getInstance()
                     .getContentResolver()
-                    .query(InstanceColumns.CONTENT_URI, null, selection,
+                    .query(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, selection,
                             selectionArgs, null);
 
             if (c.getCount() > 0) {
@@ -131,30 +125,30 @@ public abstract class GoogleMapsEngineAbstractUploader<Params, Progress, Result>
                     }
                     String instance = c
                             .getString(c
-                                    .getColumnIndex(InstanceColumns.INSTANCE_FILE_PATH));
+                                    .getColumnIndex(InstanceProviderAPI.InstanceColumns.INSTANCE_FILE_PATH));
                     String id = c.getString(c
-                            .getColumnIndex(InstanceColumns._ID));
+                            .getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
                     String jrformid = c.getString(c
-                            .getColumnIndex(InstanceColumns.JR_FORM_ID));
+                            .getColumnIndex(InstanceProviderAPI.InstanceColumns.JR_FORM_ID));
                     Uri toUpdate = Uri.withAppendedPath(
-                            InstanceColumns.CONTENT_URI, id);
+                            InstanceProviderAPI.InstanceColumns.CONTENT_URI, id);
                     ContentValues cv = new ContentValues();
 
-                    String formSelection = FormsColumns.JR_FORM_ID + "=?";
+                    String formSelection = FormsProviderAPI.FormsColumns.JR_FORM_ID + "=?";
                     String[] formSelectionArgs = {jrformid};
                     Cursor formcursor = Collect
                             .getInstance()
                             .getContentResolver()
-                            .query(FormsColumns.CONTENT_URI, null,
+                            .query(FormsProviderAPI.FormsColumns.CONTENT_URI, null,
                                     formSelection, formSelectionArgs, null);
                     String md5 = null;
                     String formFilePath = null;
                     if (formcursor.getCount() > 0) {
                         formcursor.moveToFirst();
                         md5 = formcursor.getString(formcursor
-                                .getColumnIndex(FormsColumns.MD5_HASH));
+                                .getColumnIndex(FormsProviderAPI.FormsColumns.MD5_HASH));
                         formFilePath = formcursor.getString(formcursor
-                                .getColumnIndex(FormsColumns.FORM_FILE_PATH));
+                                .getColumnIndex(FormsProviderAPI.FormsColumns.FORM_FILE_PATH));
                     }
 
                     if (md5 == null) {
@@ -174,13 +168,13 @@ public abstract class GoogleMapsEngineAbstractUploader<Params, Progress, Result>
                     publishProgress(c.getPosition() + 1, c.getCount());
                     if (!uploadOneSubmission(id, instance, jrformid, token,
                             gmeFormValues, md5, formFilePath)) {
-                        cv.put(InstanceColumns.STATUS,
+                        cv.put(InstanceProviderAPI.InstanceColumns.STATUS,
                                 InstanceProviderAPI.STATUS_SUBMISSION_FAILED);
                         Collect.getInstance().getContentResolver()
                                 .update(toUpdate, cv, null, null);
                         return;
                     } else {
-                        cv.put(InstanceColumns.STATUS,
+                        cv.put(InstanceProviderAPI.InstanceColumns.STATUS,
                                 InstanceProviderAPI.STATUS_SUBMITTED);
                         Collect.getInstance().getContentResolver()
                                 .update(toUpdate, cv, null, null);
@@ -971,7 +965,7 @@ public abstract class GoogleMapsEngineAbstractUploader<Params, Progress, Result>
                 selection.append("(");
                 while (it.hasNext()) {
                     String id = it.next();
-                    selection.append(InstanceColumns._ID + "=?");
+                    selection.append(InstanceProviderAPI.InstanceColumns._ID + "=?");
                     selectionArgs[i++] = id;
                     if (i != keys.size()) {
                         selection.append(" or ");
@@ -986,7 +980,7 @@ public abstract class GoogleMapsEngineAbstractUploader<Params, Progress, Result>
                     uploadResults = Collect
                             .getInstance()
                             .getContentResolver()
-                            .query(InstanceColumns.CONTENT_URI, null, selection.toString(),
+                            .query(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, selection.toString(),
                                     selectionArgs, null);
                     if (uploadResults.getCount() > 0) {
                         Long[] toDelete = new Long[uploadResults.getCount()];
@@ -995,7 +989,7 @@ public abstract class GoogleMapsEngineAbstractUploader<Params, Progress, Result>
                         int cnt = 0;
                         while (uploadResults.moveToNext()) {
                             toDelete[cnt] = uploadResults.getLong(uploadResults
-                                    .getColumnIndex(InstanceColumns._ID));
+                                    .getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
                             cnt++;
                         }
 

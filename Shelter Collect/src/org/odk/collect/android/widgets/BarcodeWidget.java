@@ -14,13 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.R;
-import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -30,10 +23,16 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
+import org.odk.collect.android.activities.FormEntryActivity;
+import org.odk.collect.android.application.Collect;
 
 /**
  * Widget that allows user to scan barcodes and add them to the form.
@@ -46,14 +45,14 @@ public class BarcodeWidget extends QuestionWidget implements IBinaryWidget {
 
     public BarcodeWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
-        setOrientation(LinearLayout.VERTICAL);
+        setOrientation(VERTICAL);
 
         TableLayout.LayoutParams params = new TableLayout.LayoutParams();
         params.setMargins(7, 5, 7, 5);
 
         // set button formatting
         mGetBarcodeButton = new Button(getContext());
-        mGetBarcodeButton.setId(QuestionWidget.newUniqueId());
+        mGetBarcodeButton.setId(newUniqueId());
         mGetBarcodeButton.setText(getContext().getString(R.string.get_barcode));
         mGetBarcodeButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
                 mAnswerFontsize);
@@ -89,7 +88,7 @@ public class BarcodeWidget extends QuestionWidget implements IBinaryWidget {
 
         // set text formatting
         mStringAnswer = new TextView(getContext());
-        mStringAnswer.setId(QuestionWidget.newUniqueId());
+        mStringAnswer.setId(newUniqueId());
         mStringAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mStringAnswer.setGravity(Gravity.CENTER);
 

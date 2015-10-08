@@ -14,17 +14,15 @@
 
 package org.odk.collect.android.views;
 
-import org.odk.collect.android.logic.HierarchyElement;
-import org.odk.collect.android.utilities.MediaUtils;
-import org.odk.collect.android.utilities.TextUtils;
-
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.text.Html;
 import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import org.odk.collect.android.logic.HierarchyElement;
+import org.odk.collect.android.utilities.TextUtils;
 
 public class HierarchyElementView extends RelativeLayout {
 

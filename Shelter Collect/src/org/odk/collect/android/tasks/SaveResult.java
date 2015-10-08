@@ -36,11 +36,11 @@ public class SaveResult {
         this.saveResult = saveResult;
     }
 
-    public void setSaveErrorMessage(String saveErrorMessage) {
-        this.saveErrorMessage = saveErrorMessage;
-    }
-
     public String getSaveErrorMessage() {
         return saveErrorMessage;
+    }
+
+    public void setSaveErrorMessage(String saveErrorMessage) {
+        this.saveErrorMessage = saveErrorMessage;
     }
 }

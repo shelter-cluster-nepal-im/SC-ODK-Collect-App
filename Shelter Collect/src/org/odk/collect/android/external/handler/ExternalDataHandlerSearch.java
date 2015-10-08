@@ -32,7 +32,11 @@ import org.odk.collect.android.external.ExternalDataUtil;
 import org.odk.collect.android.external.ExternalSQLiteOpenHelper;
 import org.odk.collect.android.external.ExternalSelectChoice;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Author: Meletis Margaritis

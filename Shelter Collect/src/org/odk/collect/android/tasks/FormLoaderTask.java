@@ -14,17 +14,10 @@
 
 package org.odk.collect.android.tasks;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import android.content.Intent;
+import android.database.Cursor;
+import android.os.AsyncTask;
+import android.util.Log;
 
 import org.apache.commons.io.IOUtils;
 import org.javarosa.core.model.FormDef;
@@ -37,8 +30,6 @@ import org.javarosa.core.reference.ReferenceManager;
 import org.javarosa.core.reference.RootTranslator;
 import org.javarosa.core.util.externalizable.DeserializationException;
 import org.javarosa.core.util.externalizable.ExtUtil;
-import org.javarosa.debug.Event;
-import org.javarosa.debug.EventNotifier;
 import org.javarosa.form.api.FormEntryController;
 import org.javarosa.form.api.FormEntryModel;
 import org.javarosa.xform.parse.XFormParseException;
@@ -62,10 +53,17 @@ import org.odk.collect.android.preferences.AdminPreferencesActivity;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.ZipUtils;
 
-import android.content.Intent;
-import android.database.Cursor;
-import android.os.AsyncTask;
-import android.util.Log;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -78,41 +76,17 @@ import au.com.bytecode.opencsv.CSVReader;
 public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FECWrapper> {
     private final static String t = "FormLoaderTask";
     private static final String ITEMSETS_CSV = "itemsets.csv";
-
+    private final String mXPath;
+    private final String mWaitingXPath;
+    FECWrapper data;
     private FormLoaderListener mStateListener;
     private String mErrorMsg;
     private String mInstancePath;
-    private final String mXPath;
-    private final String mWaitingXPath;
     private boolean pendingActivityResult = false;
     private int requestCode = 0;
     private int resultCode = 0;
     private Intent intent = null;
     private ExternalDataManager externalDataManager;
-
-    protected class FECWrapper {
-        FormController controller;
-        boolean usedSavepoint;
-
-        protected FECWrapper(FormController controller, boolean usedSavepoint) {
-            this.controller = controller;
-            this.usedSavepoint = usedSavepoint;
-        }
-
-        protected FormController getController() {
-            return controller;
-        }
-
-        protected boolean hasUsedSavepoint() {
-            return usedSavepoint;
-        }
-
-        protected void free() {
-            controller = null;
-        }
-    }
-
-    FECWrapper data;
 
     public FormLoaderTask(String instancePath, String XPath, String waitingXPath) {
         mInstancePath = instancePath;
@@ -642,6 +616,28 @@ public class FormLoaderTask extends AsyncTask<String, String, FormLoaderTask.FEC
                 ida.commit();
             }
             ida.close();
+        }
+    }
+
+    protected class FECWrapper {
+        FormController controller;
+        boolean usedSavepoint;
+
+        protected FECWrapper(FormController controller, boolean usedSavepoint) {
+            this.controller = controller;
+            this.usedSavepoint = usedSavepoint;
+        }
+
+        protected FormController getController() {
+            return controller;
+        }
+
+        protected boolean hasUsedSavepoint() {
+            return usedSavepoint;
+        }
+
+        protected void free() {
+            controller = null;
         }
     }
 }

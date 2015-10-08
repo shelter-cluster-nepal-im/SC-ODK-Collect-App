@@ -14,14 +14,14 @@
 
 package org.odk.collect.android.tasks;
 
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.DeleteFormsListener;
-import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
-
 import android.content.ContentResolver;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.DeleteFormsListener;
+import org.odk.collect.android.provider.FormsProviderAPI;
 
 /**
  * Task responsible for deleting selected forms.
@@ -52,7 +52,7 @@ public class DeleteFormsTask extends AsyncTask<Long, Void, Integer> {
             }
             try {
                 Uri deleteForm =
-                        Uri.withAppendedPath(FormsColumns.CONTENT_URI, params[i].toString());
+                        Uri.withAppendedPath(FormsProviderAPI.FormsColumns.CONTENT_URI, params[i].toString());
 
                 int wasDeleted = cr.delete(deleteForm, null, null);
                 deleted += wasDeleted;

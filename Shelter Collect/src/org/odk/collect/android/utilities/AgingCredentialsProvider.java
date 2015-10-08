@@ -39,13 +39,13 @@
 
 package org.odk.collect.android.utilities;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.opendatakit.httpclientandroidlib.annotation.ThreadSafe;
 import org.opendatakit.httpclientandroidlib.auth.AuthScope;
 import org.opendatakit.httpclientandroidlib.auth.Credentials;
 import org.opendatakit.httpclientandroidlib.client.CredentialsProvider;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Modified BasicCredentialsProvider that will clear the provider
@@ -74,23 +74,6 @@ public class AgingCredentialsProvider implements CredentialsProvider {
         this.credMap = new ConcurrentHashMap<AuthScope, Credentials>();
         this.expiryInterval = expiryInterval;
         nextClearTimestamp = System.currentTimeMillis() + expiryInterval;
-    }
-
-    public void setCredentials(
-            final AuthScope authscope,
-            final Credentials credentials) {
-        if (authscope == null) {
-            throw new IllegalArgumentException("Authentication scope may not be null");
-        }
-        if (nextClearTimestamp < System.currentTimeMillis()) {
-            clear();
-        }
-        nextClearTimestamp = System.currentTimeMillis() + expiryInterval;
-        if (credentials == null) {
-            credMap.remove(authscope);
-        } else {
-            credMap.put(authscope, credentials);
-        }
     }
 
     /**
@@ -122,6 +105,23 @@ public class AgingCredentialsProvider implements CredentialsProvider {
             }
         }
         return creds;
+    }
+
+    public void setCredentials(
+            final AuthScope authscope,
+            final Credentials credentials) {
+        if (authscope == null) {
+            throw new IllegalArgumentException("Authentication scope may not be null");
+        }
+        if (nextClearTimestamp < System.currentTimeMillis()) {
+            clear();
+        }
+        nextClearTimestamp = System.currentTimeMillis() + expiryInterval;
+        if (credentials == null) {
+            credMap.remove(authscope);
+        } else {
+            credMap.put(authscope, credentials);
+        }
     }
 
     public Credentials getCredentials(final AuthScope authscope) {

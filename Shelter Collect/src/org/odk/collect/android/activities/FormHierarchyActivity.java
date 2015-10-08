@@ -14,20 +14,6 @@
 
 package org.odk.collect.android.activities;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.javarosa.core.model.FormIndex;
-import org.javarosa.form.api.FormEntryCaption;
-import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.R;
-import org.odk.collect.android.adapters.HierarchyListAdapter;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.exception.JavaRosaException;
-import org.odk.collect.android.logic.FormController;
-import org.odk.collect.android.logic.HierarchyElement;
-
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -41,6 +27,20 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.form.api.FormEntryCaption;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
+import org.odk.collect.android.adapters.HierarchyListAdapter;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.exception.JavaRosaException;
+import org.odk.collect.android.logic.FormController;
+import org.odk.collect.android.logic.HierarchyElement;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class FormHierarchyActivity extends ListActivity {
 
     private static final String t = "FormHierarchyActivity";
@@ -51,13 +51,10 @@ public class FormHierarchyActivity extends ListActivity {
     private static final int QUESTION = 4;
 
     private static final String mIndent = "     ";
-
-    private Button jumpPreviousButton;
-
     List<HierarchyElement> formList;
     TextView mPath;
-
     FormIndex mStartIndex;
+    private Button jumpPreviousButton;
     private FormIndex currentIndex;
 
 

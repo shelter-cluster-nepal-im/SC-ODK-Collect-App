@@ -14,14 +14,6 @@
 
 package org.odk.collect.android.adapters;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.logic.DriveListItem;
-
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -31,6 +23,14 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.logic.DriveListItem;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class FileArrayAdapter extends ArrayAdapter<DriveListItem> {
 

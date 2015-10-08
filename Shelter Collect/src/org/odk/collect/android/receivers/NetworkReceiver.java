@@ -1,22 +1,4 @@
-
 package org.odk.collect.android.receivers;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.activities.NotificationActivity;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.InstanceUploaderListener;
-import org.odk.collect.android.preferences.PreferencesActivity;
-import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
-import org.odk.collect.android.tasks.GoogleMapsEngineAbstractUploader;
-import org.odk.collect.android.tasks.InstanceUploaderTask;
-import org.odk.collect.android.utilities.WebUtils;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -36,6 +18,22 @@ import android.support.v4.app.NotificationCompat;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.activities.NotificationActivity;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.InstanceUploaderListener;
+import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.collect.android.tasks.GoogleMapsEngineAbstractUploader;
+import org.odk.collect.android.tasks.InstanceUploaderTask;
+import org.odk.collect.android.utilities.WebUtils;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 public class NetworkReceiver extends BroadcastReceiver implements InstanceUploaderListener {
 
@@ -97,7 +95,7 @@ public class NetworkReceiver extends BroadcastReceiver implements InstanceUpload
         if (!running) {
             running = true;
 
-            String selection = InstanceColumns.STATUS + "=? or " + InstanceColumns.STATUS + "=?";
+            String selection = InstanceProviderAPI.InstanceColumns.STATUS + "=? or " + InstanceProviderAPI.InstanceColumns.STATUS + "=?";
             String selectionArgs[] =
                     {
                             InstanceProviderAPI.STATUS_COMPLETE,
@@ -105,13 +103,13 @@ public class NetworkReceiver extends BroadcastReceiver implements InstanceUpload
                     };
 
             ArrayList<Long> toUpload = new ArrayList<Long>();
-            Cursor c = context.getContentResolver().query(InstanceColumns.CONTENT_URI, null,
+            Cursor c = context.getContentResolver().query(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null,
                     selection, selectionArgs, null);
             try {
                 if (c != null && c.getCount() > 0) {
                     c.move(-1);
                     while (c.moveToNext()) {
-                        Long l = c.getLong(c.getColumnIndex(InstanceColumns._ID));
+                        Long l = c.getLong(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
                         toUpload.add(Long.valueOf(l));
                     }
                 }
@@ -195,7 +193,7 @@ public class NetworkReceiver extends BroadcastReceiver implements InstanceUpload
             int i = 0;
             while (it.hasNext()) {
                 String id = it.next();
-                selection.append(InstanceColumns._ID + "=?");
+                selection.append(InstanceProviderAPI.InstanceColumns._ID + "=?");
                 selectionArgs[i++] = id;
                 if (i != keys.size()) {
                     selection.append(" or ");
@@ -208,15 +206,15 @@ public class NetworkReceiver extends BroadcastReceiver implements InstanceUpload
                     results = Collect
                             .getInstance()
                             .getContentResolver()
-                            .query(InstanceColumns.CONTENT_URI, null, selection.toString(),
+                            .query(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, selection.toString(),
                                     selectionArgs, null);
                     if (results.getCount() > 0) {
                         results.moveToPosition(-1);
                         while (results.moveToNext()) {
                             String name = results.getString(results
-                                    .getColumnIndex(InstanceColumns.DISPLAY_NAME));
+                                    .getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME));
                             String id = results.getString(results
-                                    .getColumnIndex(InstanceColumns._ID));
+                                    .getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
                             message.append(name + " - " + result.get(id) + "\n\n");
                         }
                     }
@@ -283,12 +281,12 @@ public class NetworkReceiver extends BroadcastReceiver implements InstanceUpload
 
             mResults = new HashMap<String, String>();
 
-            String selection = InstanceColumns._ID + "=?";
+            String selection = InstanceProviderAPI.InstanceColumns._ID + "=?";
             String[] selectionArgs = new String[(values == null) ? 0 : values.length];
             if (values != null) {
                 for (int i = 0; i < values.length; i++) {
                     if (i != values.length - 1) {
-                        selection += " or " + InstanceColumns._ID + "=?";
+                        selection += " or " + InstanceProviderAPI.InstanceColumns._ID + "=?";
                     }
                     selectionArgs[i] = values[i].toString();
                 }

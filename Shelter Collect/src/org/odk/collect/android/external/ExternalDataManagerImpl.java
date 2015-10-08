@@ -35,9 +35,8 @@ import java.util.Map;
  */
 public class ExternalDataManagerImpl implements ExternalDataManager {
 
-    private Map<String, ExternalSQLiteOpenHelper> dbMap = new HashMap<String, ExternalSQLiteOpenHelper>();
-
     private final File mediaFolder;
+    private Map<String, ExternalSQLiteOpenHelper> dbMap = new HashMap<String, ExternalSQLiteOpenHelper>();
 
     public ExternalDataManagerImpl(File mediaFolder) {
         this.mediaFolder = mediaFolder;

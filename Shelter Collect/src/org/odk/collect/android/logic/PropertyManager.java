@@ -14,14 +14,6 @@
 
 package org.odk.collect.android.logic;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import org.javarosa.core.services.IPropertyManager;
-import org.javarosa.core.services.properties.IPropertyRules;
-import org.odk.collect.android.preferences.PreferencesActivity;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
@@ -31,6 +23,14 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import org.javarosa.core.services.IPropertyManager;
+import org.javarosa.core.services.properties.IPropertyRules;
+import org.odk.collect.android.preferences.PreferencesActivity;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
 /**
  * Used to return device properties to JavaRosa
  *
@@ -39,31 +39,22 @@ import android.util.Log;
 
 public class PropertyManager implements IPropertyManager {
 
-    private String t = "PropertyManager";
-
-    private Context mContext;
-
-    private TelephonyManager mTelephonyManager;
-    private HashMap<String, String> mProperties;
-
     public final static String DEVICE_ID_PROPERTY = "deviceid"; // imei
-    private final static String SUBSCRIBER_ID_PROPERTY = "subscriberid"; // imsi
-    private final static String SIM_SERIAL_PROPERTY = "simserial";
-    private final static String PHONE_NUMBER_PROPERTY = "phonenumber";
-    private final static String USERNAME = "username";
-    private final static String EMAIL = "email";
-
     public final static String OR_DEVICE_ID_PROPERTY = "uri:deviceid"; // imei
     public final static String OR_SUBSCRIBER_ID_PROPERTY = "uri:subscriberid"; // imsi
     public final static String OR_SIM_SERIAL_PROPERTY = "uri:simserial";
     public final static String OR_PHONE_NUMBER_PROPERTY = "uri:phonenumber";
     public final static String OR_USERNAME = "uri:username";
     public final static String OR_EMAIL = "uri:email";
-
-
-    public String getName() {
-        return "Property Manager";
-    }
+    private final static String SUBSCRIBER_ID_PROPERTY = "subscriberid"; // imsi
+    private final static String SIM_SERIAL_PROPERTY = "simserial";
+    private final static String PHONE_NUMBER_PROPERTY = "phonenumber";
+    private final static String USERNAME = "username";
+    private final static String EMAIL = "email";
+    private String t = "PropertyManager";
+    private Context mContext;
+    private TelephonyManager mTelephonyManager;
+    private HashMap<String, String> mProperties;
 
 
     public PropertyManager(Context context) {
@@ -141,6 +132,10 @@ public class PropertyManager implements IPropertyManager {
             mProperties.put(EMAIL, value);
             mProperties.put(OR_EMAIL, "mailto:" + value);
         }
+    }
+
+    public String getName() {
+        return "Property Manager";
     }
 
     @Override

@@ -14,16 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.AudioPlayListener;
-import org.odk.collect.android.utilities.TextUtils;
-import org.odk.collect.android.views.MediaLayout;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -41,37 +31,31 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.AudioPlayListener;
+import org.odk.collect.android.utilities.TextUtils;
+import org.odk.collect.android.views.MediaLayout;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class QuestionWidget extends LinearLayout implements AudioPlayListener {
 
     @SuppressWarnings("unused")
     private final static String t = "QuestionWidget";
     private static int idGenerator = 1211322;
-
-    /**
-     * Generate a unique ID to keep Android UI happy when the screen orientation
-     * changes.
-     *
-     * @return
-     */
-    public static int newUniqueId() {
-        return ++idGenerator;
-    }
-
-    private LinearLayout.LayoutParams mLayout;
-    protected FormEntryPrompt mPrompt;
-
     protected final int mQuestionFontsize;
     protected final int mAnswerFontsize;
-
+    protected FormEntryPrompt mPrompt;
+    protected MediaPlayer mPlayer;
+    protected int mPlayColor = Color.BLUE;
+    protected int mPlayBackgroundColor = Color.WHITE;
+    private LinearLayout.LayoutParams mLayout;
     private TextView mQuestionText;
     private MediaLayout mediaLayout;
     private TextView mHelpText;
-
-    protected MediaPlayer mPlayer;
-
-    protected int mPlayColor = Color.BLUE;
-    protected int mPlayBackgroundColor = Color.WHITE;
-
     public QuestionWidget(Context context, FormEntryPrompt p) {
         super(context);
 
@@ -119,6 +103,16 @@ public abstract class QuestionWidget extends LinearLayout implements AudioPlayLi
             }
         }
         mediaLayout.setPlayTextBackgroundColor(mPlayBackgroundColor);
+    }
+
+    /**
+     * Generate a unique ID to keep Android UI happy when the screen orientation
+     * changes.
+     *
+     * @return
+     */
+    public static int newUniqueId() {
+        return ++idGenerator;
     }
 
     public void playAudio() {

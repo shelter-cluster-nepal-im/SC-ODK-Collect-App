@@ -14,18 +14,6 @@
 
 package org.odk.collect.android.views;
 
-import java.io.File;
-
-import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.reference.InvalidReferenceException;
-import org.javarosa.core.reference.ReferenceManager;
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.AudioPlayListener;
-import org.odk.collect.android.utilities.FileUtils;
-import org.odk.collect.android.widgets.QuestionWidget;
-
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -48,6 +36,17 @@ import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.ReferenceManager;
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.AudioPlayListener;
+import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.widgets.QuestionWidget;
+
+import java.io.File;
 
 /**
  * This layout is used anywhere we can have image/audio/video/text. TODO: It would probably be nice

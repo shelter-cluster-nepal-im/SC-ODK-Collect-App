@@ -14,28 +14,8 @@
 
 package org.odk.collect.android.utilities;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.odk.collect.android.application.Collect;
-
-import android.annotation.SuppressLint;
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Audio;
-import android.provider.MediaStore.Images;
-import android.provider.MediaStore.Video;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 
 public class TextUtils {
     private static final String t = "TextUtils";

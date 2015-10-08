@@ -14,13 +14,6 @@
 
 package org.odk.collect.android.activities;
 
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.DiskSyncListener;
-import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
-import org.odk.collect.android.tasks.DiskSyncTask;
-import org.odk.collect.android.utilities.VersionHidingCursorAdapter;
-
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ContentUris;
@@ -35,6 +28,13 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.DiskSyncListener;
+import org.odk.collect.android.provider.FormsProviderAPI;
+import org.odk.collect.android.tasks.DiskSyncTask;
+import org.odk.collect.android.utilities.VersionHidingCursorAdapter;
 
 /**
  * Responsible for displaying all the valid forms in the forms directory. Stores the path to
@@ -68,11 +68,11 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
         setContentView(R.layout.chooser_list_layout);
         setTitle(getString(R.string.app_name) + " > " + getString(R.string.enter_data));
 
-        String sortOrder = FormsColumns.DISPLAY_NAME + " ASC, " + FormsColumns.JR_VERSION + " DESC";
-        Cursor c = managedQuery(FormsColumns.CONTENT_URI, null, null, null, sortOrder);
+        String sortOrder = FormsProviderAPI.FormsColumns.DISPLAY_NAME + " ASC, " + FormsProviderAPI.FormsColumns.JR_VERSION + " DESC";
+        Cursor c = managedQuery(FormsProviderAPI.FormsColumns.CONTENT_URI, null, null, null, sortOrder);
 
         String[] data = new String[]{
-                FormsColumns.DISPLAY_NAME, FormsColumns.DISPLAY_SUBTEXT, FormsColumns.JR_VERSION
+                FormsProviderAPI.FormsColumns.DISPLAY_NAME, FormsProviderAPI.FormsColumns.DISPLAY_SUBTEXT, FormsProviderAPI.FormsColumns.JR_VERSION
         };
         int[] view = new int[]{
                 R.id.text1, R.id.text2, R.id.text3
@@ -80,7 +80,7 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
 
         // render total instance view
         SimpleCursorAdapter instances =
-                new VersionHidingCursorAdapter(FormsColumns.JR_VERSION, this, R.layout.two_item, c, data, view);
+                new VersionHidingCursorAdapter(FormsProviderAPI.FormsColumns.JR_VERSION, this, R.layout.two_item, c, data, view);
         setListAdapter(instances);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(syncMsgKey)) {
@@ -122,7 +122,7 @@ public class FormChooserList extends ListActivity implements DiskSyncListener {
     protected void onListItemClick(ListView listView, View view, int position, long id) {
         // get uri to form
         long idFormsTable = getListAdapter().getItemId(position);
-        Uri formUri = ContentUris.withAppendedId(FormsColumns.CONTENT_URI, idFormsTable);
+        Uri formUri = ContentUris.withAppendedId(FormsProviderAPI.FormsColumns.CONTENT_URI, idFormsTable);
 
         Collect.getInstance().getActivityLogger().logAction(this, "onListItemClick", formUri.toString());
 

@@ -14,16 +14,15 @@
 
 package org.odk.collect.android.utilities;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
+
 import org.apache.commons.io.IOUtils;
 import org.javarosa.xform.parse.XFormParser;
 import org.kxml2.kdom.Document;
 import org.kxml2.kdom.Element;
 import org.kxml2.kdom.Node;
-
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Log;
-
 import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 
@@ -47,17 +46,14 @@ import java.util.HashMap;
  * @author Carl Hartung (carlhartung@gmail.com)
  */
 public class FileUtils {
-    private final static String t = "FileUtils";
-
     // Used to validate and display valid form names.
     public static final String VALID_FILENAME = "[ _\\-A-Za-z0-9]*.x[ht]*ml";
-
     public static final String FORMID = "formid";
     public static final String VERSION = "version"; // arbitrary string in OpenRosa 1.0
     public static final String TITLE = "title";
     public static final String SUBMISSIONURI = "submission";
     public static final String BASE64_RSA_PUBLIC_KEY = "base64RsaPublicKey";
-
+    private final static String t = "FileUtils";
 
     public static boolean createFolder(String path) {
         boolean made = true;

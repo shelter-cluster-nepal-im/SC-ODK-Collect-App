@@ -14,8 +14,6 @@
 
 package org.odk.collect.android.utilities;
 
-import org.odk.collect.android.R;
-
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -31,6 +29,8 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.HorizontalScrollView;
 import android.widget.ScrollView;
 
+import org.odk.collect.android.R;
+
 /**
  * Based heavily upon:
  * http://www.yougli.net/android/a-photoshop-like-color-picker
@@ -40,57 +40,59 @@ import android.widget.ScrollView;
  * @author yougli@yougli.net
  */
 public class ColorPickerDialog extends Dialog {
+    private OnColorChangedListener mListener;
+    private int mInitialColor, mDefaultColor;
+    private String mKey;
+    public ColorPickerDialog(Context context, OnColorChangedListener listener,
+                             String key, int initialColor, int defaultColor, String title) {
+        super(context);
+
+        mListener = listener;
+        mKey = key;
+        mInitialColor = initialColor;
+        mDefaultColor = defaultColor;
+        setTitle(title);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        OnColorChangedListener l = new OnColorChangedListener() {
+            public void colorChanged(String key, int color) {
+                mListener.colorChanged(mKey, color);
+                dismiss();
+            }
+        };
+
+/*BIDIRECTIONAL SCROLLVIEW*/
+        ScrollView sv = new ScrollView(this.getContext());
+        WScrollView hsv = new WScrollView(this.getContext());
+        hsv.sv = sv;
+/*END OF BIDIRECTIONAL SCROLLVIEW*/
+
+        sv.addView(new ColorPickerView(getContext(), l, mInitialColor,
+                mDefaultColor), new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        hsv.addView(sv, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.FILL_PARENT));
+        setContentView(hsv, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+
+        setCanceledOnTouchOutside(true);
+    }
+
     public interface OnColorChangedListener {
         void colorChanged(String key, int color);
     }
 
-    private OnColorChangedListener mListener;
-    private int mInitialColor, mDefaultColor;
-    private String mKey;
-
-    /**
-     * Modified HorizontalScrollView that communicates scroll
-     * actions to interior Vertical scroll view.
-     * From: http://stackoverflow.com/questions/3866499/two-directional-scroll-view
-     */
-    public class WScrollView extends HorizontalScrollView {
-        public ScrollView sv;
-
-        public WScrollView(Context context) {
-            super(context);
-        }
-
-        public WScrollView(Context context, AttributeSet attrs) {
-            super(context, attrs);
-        }
-
-        public WScrollView(Context context, AttributeSet attrs, int defStyle) {
-            super(context, attrs, defStyle);
-        }
-
-        @Override
-        public boolean onTouchEvent(MotionEvent event) {
-            boolean ret = super.onTouchEvent(event);
-            ret = ret | sv.onTouchEvent(event);
-            return ret;
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(MotionEvent event) {
-            boolean ret = super.onInterceptTouchEvent(event);
-            ret = ret | sv.onInterceptTouchEvent(event);
-            return ret;
-        }
-    }
-
     private static class ColorPickerView extends View {
+        private final int[] mHueBarColors = new int[258];
         private Paint mPaint;
         private float mCurrentHue = 0;
         private int mCurrentX = 0, mCurrentY = 0;
         private int mCurrentColor, mDefaultColor;
-        private final int[] mHueBarColors = new int[258];
         private int[] mMainColors = new int[65536];
         private OnColorChangedListener mListener;
+        private boolean afterFirstDown = false;
+        private float startX;
+        private float startY;
 
         ColorPickerView(Context c, OnColorChangedListener l, int color,
                         int defaultColor) {
@@ -284,10 +286,6 @@ public class ColorPickerDialog extends Dialog {
             setMeasuredDimension(276, 366);
         }
 
-        private boolean afterFirstDown = false;
-        private float startX;
-        private float startY;
-
         @Override
         public boolean onTouchEvent(MotionEvent event) {
             // allow scrolling...
@@ -371,38 +369,38 @@ public class ColorPickerDialog extends Dialog {
         }
     }
 
-    public ColorPickerDialog(Context context, OnColorChangedListener listener,
-                             String key, int initialColor, int defaultColor, String title) {
-        super(context);
+    /**
+     * Modified HorizontalScrollView that communicates scroll
+     * actions to interior Vertical scroll view.
+     * From: http://stackoverflow.com/questions/3866499/two-directional-scroll-view
+     */
+    public class WScrollView extends HorizontalScrollView {
+        public ScrollView sv;
 
-        mListener = listener;
-        mKey = key;
-        mInitialColor = initialColor;
-        mDefaultColor = defaultColor;
-        setTitle(title);
-    }
+        public WScrollView(Context context) {
+            super(context);
+        }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        OnColorChangedListener l = new OnColorChangedListener() {
-            public void colorChanged(String key, int color) {
-                mListener.colorChanged(mKey, color);
-                dismiss();
-            }
-        };
+        public WScrollView(Context context, AttributeSet attrs) {
+            super(context, attrs);
+        }
 
-/*BIDIRECTIONAL SCROLLVIEW*/
-        ScrollView sv = new ScrollView(this.getContext());
-        WScrollView hsv = new WScrollView(this.getContext());
-        hsv.sv = sv;
-/*END OF BIDIRECTIONAL SCROLLVIEW*/
+        public WScrollView(Context context, AttributeSet attrs, int defStyle) {
+            super(context, attrs, defStyle);
+        }
 
-        sv.addView(new ColorPickerView(getContext(), l, mInitialColor,
-                mDefaultColor), new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-        hsv.addView(sv, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.FILL_PARENT));
-        setContentView(hsv, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            boolean ret = super.onTouchEvent(event);
+            ret = ret | sv.onTouchEvent(event);
+            return ret;
+        }
 
-        setCanceledOnTouchOutside(true);
+        @Override
+        public boolean onInterceptTouchEvent(MotionEvent event) {
+            boolean ret = super.onInterceptTouchEvent(event);
+            ret = ret | sv.onInterceptTouchEvent(event);
+            return ret;
+        }
     }
 }

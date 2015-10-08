@@ -2,9 +2,11 @@ package org.odk.collect.android.provider;
 
 import com.google.api.client.util.Base64;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.*;
+import java.net.URL;
 import java.util.Map;
 
 
@@ -40,7 +42,8 @@ public class Post_New_ag_Request {
 
         String userpass = username + ":" + password;
         byte[] encode = Base64.encodeBase64(userpass.getBytes());
-        String basicAuth = "Basic " +new String(encode);;
+        String basicAuth = "Basic " + new String(encode);
+        ;
 
         conn.setRequestProperty("Authorization", basicAuth);
 

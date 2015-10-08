@@ -14,18 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import java.util.List;
-
-import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.SelectOneData;
-import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.xpath.expr.XPathFuncExpr;
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.external.ExternalDataUtil;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -40,6 +28,18 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.SelectOneData;
+import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.xpath.expr.XPathFuncExpr;
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.external.ExternalDataUtil;
+
+import java.util.List;
+
 /**
  * SpinnerWidget handles select-one fields. Instead of a list of buttons it uses a spinner, wherein
  * the user clicks a button and the choices pop up in a dialogue box. The goal is to be more
@@ -48,10 +48,10 @@ import android.widget.TextView;
  * @author Jeff Beorse (jeff@beorse.net)
  */
 public class SpinnerWidget extends QuestionWidget {
+    private static final int BROWN = 0xFF936931;
     List<SelectChoice> mItems;
     Spinner spinner;
     String[] choices;
-    private static final int BROWN = 0xFF936931;
 
 
     public SpinnerWidget(Context context, FormEntryPrompt prompt) {
@@ -153,6 +153,17 @@ public class SpinnerWidget extends QuestionWidget {
 
     }
 
+    @Override
+    public void setOnLongClickListener(OnLongClickListener l) {
+        spinner.setOnLongClickListener(l);
+    }
+
+    @Override
+    public void cancelLongPress() {
+        super.cancelLongPress();
+        spinner.cancelLongPress();
+    }
+
     // Defines how to display the select answers
     private class SpinnerAdapter extends ArrayAdapter<String> {
         Context context;
@@ -220,19 +231,6 @@ public class SpinnerWidget extends QuestionWidget {
             return convertView;
         }
 
-    }
-
-
-    @Override
-    public void setOnLongClickListener(OnLongClickListener l) {
-        spinner.setOnLongClickListener(l);
-    }
-
-
-    @Override
-    public void cancelLongPress() {
-        super.cancelLongPress();
-        spinner.cancelLongPress();
     }
 
 }

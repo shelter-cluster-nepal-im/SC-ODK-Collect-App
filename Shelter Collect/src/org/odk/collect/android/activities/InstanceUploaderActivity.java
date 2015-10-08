@@ -14,20 +14,6 @@
 
 package org.odk.collect.android.activities;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.InstanceUploaderListener;
-import org.odk.collect.android.preferences.PreferencesActivity;
-import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
-import org.odk.collect.android.tasks.InstanceUploaderTask;
-import org.odk.collect.android.utilities.WebUtils;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -43,6 +29,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.InstanceUploaderListener;
+import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.collect.android.tasks.InstanceUploaderTask;
+import org.odk.collect.android.utilities.WebUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Activity to upload completed forms.
@@ -219,7 +219,7 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
         int i = 0;
         while (it.hasNext()) {
             String id = it.next();
-            selection.append(InstanceColumns._ID + "=?");
+            selection.append(InstanceProviderAPI.InstanceColumns._ID + "=?");
             selectionArgs[i++] = id;
             if (i != keys.size()) {
                 selection.append(" or ");
@@ -230,14 +230,14 @@ public class InstanceUploaderActivity extends Activity implements InstanceUpload
         {
             Cursor results = null;
             try {
-                results = getContentResolver().query(InstanceColumns.CONTENT_URI,
+                results = getContentResolver().query(InstanceProviderAPI.InstanceColumns.CONTENT_URI,
                         null, selection.toString(), selectionArgs, null);
                 if (results.getCount() > 0) {
                     results.moveToPosition(-1);
                     while (results.moveToNext()) {
                         String name =
-                                results.getString(results.getColumnIndex(InstanceColumns.DISPLAY_NAME));
-                        String id = results.getString(results.getColumnIndex(InstanceColumns._ID));
+                                results.getString(results.getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME));
+                        String id = results.getString(results.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
                         message.append(name + " - " + result.get(id) + "\n\n");
                     }
                 } else {

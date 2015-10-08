@@ -14,8 +14,6 @@
 
 package org.odk.collect.android.picasa;
 
-import java.io.IOException;
-
 import com.google.api.client.googleapis.MethodOverride;
 import com.google.api.client.http.AbstractHttpContent;
 import com.google.api.client.http.GenericUrl;
@@ -24,6 +22,8 @@ import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
 
+import java.io.IOException;
+
 /**
  * GData client.
  *
@@ -31,18 +31,14 @@ import com.google.api.client.http.HttpTransport;
  */
 public abstract class GDataClient {
 
-    private HttpRequestFactory requestFactory;
-
-    private final String gdataVersion;
-
-    private String applicationName;
-
-    private boolean prettyPrint;
-
     /**
      * Method override needed for PATCH.
      */
     final MethodOverride override = new MethodOverride();
+    private final String gdataVersion;
+    private HttpRequestFactory requestFactory;
+    private String applicationName;
+    private boolean prettyPrint;
 
     protected GDataClient(String gdataVersion, HttpRequestFactory requestFactory) {
         this.gdataVersion = gdataVersion;

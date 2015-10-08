@@ -14,29 +14,28 @@
 
 package org.odk.collect.android.preferences;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-
-import android.preference.ListPreference;
-import android.preference.Preference;
-
-import org.javarosa.core.model.FormDef;
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.utilities.CompatibilityUtils;
-
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.ListPreference;
+import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import org.javarosa.core.model.FormDef;
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.utilities.CompatibilityUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 /**
  * Handles admin preferences, which are password-protectable and govern which app features and
@@ -46,11 +45,10 @@ import android.widget.Toast;
  */
 public class AdminPreferencesActivity extends PreferenceActivity {
 
+    private static final int SAVE_PREFS_MENU = Menu.FIRST;
     public static String ADMIN_PREFERENCES = "admin_prefs";
-
     // key for this preference screen
     public static String KEY_ADMIN_PW = "admin_pw";
-
     // keys for each preference
     // main menu
     public static String KEY_EDIT_SAVED = "edit_saved";
@@ -77,16 +75,85 @@ public class AdminPreferencesActivity extends PreferenceActivity {
     public static String KEY_ACCESS_SETTINGS = "access_settings";
     public static String KEY_SAVE_AS = "save_as";
     public static String KEY_MARK_AS_FINALIZED = "mark_as_finalized";
-
     public static String KEY_AUTOSEND_WIFI = "autosend_wifi";
     public static String KEY_AUTOSEND_NETWORK = "autosend_network";
-
     public static String KEY_NAVIGATION = "navigation";
     public static String KEY_CONSTRAINT_BEHAVIOR = "constraint_behavior";
-
     public static String KEY_FORM_PROCESSING_LOGIC = "form_processing_logic";
 
-    private static final int SAVE_PREFS_MENU = Menu.FIRST;
+    public static boolean saveSharedPreferencesToFile(File dst, Context context) {
+        // this should be in a thread if it gets big, but for now it's tiny
+        boolean res = false;
+        ObjectOutputStream output = null;
+        try {
+            output = new ObjectOutputStream(new FileOutputStream(dst));
+            SharedPreferences pref = PreferenceManager
+                    .getDefaultSharedPreferences(context);
+            SharedPreferences adminPreferences = context.getSharedPreferences(
+                    AdminPreferencesActivity.ADMIN_PREFERENCES, 0);
+
+            output.writeObject(pref.getAll());
+            output.writeObject(adminPreferences.getAll());
+
+            res = true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (output != null) {
+                    output.flush();
+                    output.close();
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return res;
+    }
+
+    public static FormDef.EvalBehavior getConfiguredFormProcessingLogic(Context context) {
+        FormDef.EvalBehavior mode;
+
+        SharedPreferences adminPreferences = context.getSharedPreferences(ADMIN_PREFERENCES, 0);
+        String formProcessingLoginIndex = adminPreferences.getString(KEY_FORM_PROCESSING_LOGIC, context.getString(R.string.default_form_processing_logic));
+        try {
+            if ("-1".equals(formProcessingLoginIndex)) {
+                mode = FormDef.recommendedMode;
+            } else {
+                int preferredModeIndex = Integer.parseInt(formProcessingLoginIndex);
+                switch (preferredModeIndex) {
+                    case 0: {
+                        mode = FormDef.EvalBehavior.Fast_2014;
+                        break;
+                    }
+                    case 1: {
+                        mode = FormDef.EvalBehavior.Safe_2014;
+                        break;
+                    }
+                    case 2: {
+                        mode = FormDef.EvalBehavior.April_2014;
+                        break;
+                    }
+                    case 3: {
+                        mode = FormDef.EvalBehavior.Legacy;
+                        break;
+                    }
+                    default: {
+                        mode = FormDef.recommendedMode;
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.w("AdminPreferencesActivity", "Unable to get EvalBehavior -- defaulting to recommended mode");
+            mode = FormDef.recommendedMode;
+        }
+
+        return mode;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,80 +228,5 @@ public class AdminPreferencesActivity extends PreferenceActivity {
 
         }
         return super.onOptionsItemSelected(item);
-    }
-
-
-    public static boolean saveSharedPreferencesToFile(File dst, Context context) {
-        // this should be in a thread if it gets big, but for now it's tiny
-        boolean res = false;
-        ObjectOutputStream output = null;
-        try {
-            output = new ObjectOutputStream(new FileOutputStream(dst));
-            SharedPreferences pref = PreferenceManager
-                    .getDefaultSharedPreferences(context);
-            SharedPreferences adminPreferences = context.getSharedPreferences(
-                    AdminPreferencesActivity.ADMIN_PREFERENCES, 0);
-
-            output.writeObject(pref.getAll());
-            output.writeObject(adminPreferences.getAll());
-
-            res = true;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (output != null) {
-                    output.flush();
-                    output.close();
-                }
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-        return res;
-    }
-
-    public static FormDef.EvalBehavior getConfiguredFormProcessingLogic(Context context) {
-        FormDef.EvalBehavior mode;
-
-        SharedPreferences adminPreferences = context.getSharedPreferences(ADMIN_PREFERENCES, 0);
-        String formProcessingLoginIndex = adminPreferences.getString(KEY_FORM_PROCESSING_LOGIC, context.getString(R.string.default_form_processing_logic));
-        try {
-            if ("-1".equals(formProcessingLoginIndex)) {
-                mode = FormDef.recommendedMode;
-            } else {
-                int preferredModeIndex = Integer.parseInt(formProcessingLoginIndex);
-                switch (preferredModeIndex) {
-                    case 0: {
-                        mode = FormDef.EvalBehavior.Fast_2014;
-                        break;
-                    }
-                    case 1: {
-                        mode = FormDef.EvalBehavior.Safe_2014;
-                        break;
-                    }
-                    case 2: {
-                        mode = FormDef.EvalBehavior.April_2014;
-                        break;
-                    }
-                    case 3: {
-                        mode = FormDef.EvalBehavior.Legacy;
-                        break;
-                    }
-                    default: {
-                        mode = FormDef.recommendedMode;
-                        break;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.w("AdminPreferencesActivity", "Unable to get EvalBehavior -- defaulting to recommended mode");
-            mode = FormDef.recommendedMode;
-        }
-
-        return mode;
     }
 }

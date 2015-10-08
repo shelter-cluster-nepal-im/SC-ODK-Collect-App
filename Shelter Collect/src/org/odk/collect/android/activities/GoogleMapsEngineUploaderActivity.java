@@ -20,19 +20,6 @@
 
 package org.odk.collect.android.activities;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.InstanceUploaderListener;
-import org.odk.collect.android.preferences.PreferencesActivity;
-import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
-import org.odk.collect.android.tasks.GoogleMapsEngineAbstractUploader;
-import org.odk.collect.android.tasks.GoogleMapsEngineTask;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -50,6 +37,19 @@ import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.InstanceUploaderListener;
+import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.collect.android.tasks.GoogleMapsEngineAbstractUploader;
+import org.odk.collect.android.tasks.GoogleMapsEngineTask;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 public class GoogleMapsEngineUploaderActivity extends Activity implements
         InstanceUploaderListener {
@@ -174,8 +174,7 @@ public class GoogleMapsEngineUploaderActivity extends Activity implements
             // the user backed out
             finish();
         } else {
-            Log.e(tag, "unknown request: " + requestCode + " :: result: "
-                    + resultCode);
+            Log.e(tag, "unknown request: " + requestCode + " :: result: "+ resultCode);
         }
     }
 
@@ -258,7 +257,7 @@ public class GoogleMapsEngineUploaderActivity extends Activity implements
             int i = 0;
             while (it.hasNext()) {
                 String id = it.next();
-                selection.append(InstanceColumns._ID + "=?");
+                selection.append(InstanceProviderAPI.InstanceColumns._ID + "=?");
                 selectionArgs[i++] = id;
                 if (i != keys.size()) {
                     selection.append(" or ");
@@ -268,15 +267,15 @@ public class GoogleMapsEngineUploaderActivity extends Activity implements
             Cursor results = null;
             try {
                 results = getContentResolver().query(
-                        InstanceColumns.CONTENT_URI, null,
+                        InstanceProviderAPI.InstanceColumns.CONTENT_URI, null,
                         selection.toString(), selectionArgs, null);
                 if (results.getCount() > 0) {
                     results.moveToPosition(-1);
                     while (results.moveToNext()) {
                         String name = results.getString(results
-                                .getColumnIndex(InstanceColumns.DISPLAY_NAME));
+                                .getColumnIndex(InstanceProviderAPI.InstanceColumns.DISPLAY_NAME));
                         String id = results.getString(results
-                                .getColumnIndex(InstanceColumns._ID));
+                                .getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
                         message.append(name + " - " + result.get(id) + "\n\n");
                     }
                 } else {
@@ -373,6 +372,11 @@ public class GoogleMapsEngineUploaderActivity extends Activity implements
         mAlertDialog.show();
     }
 
+    @Override
+    public void authRequest(Uri url, HashMap<String, String> doneSoFar) {
+        // this shouldn't be in the interface...
+    }
+
     public class GoogleMapsEngineInstanceUploaderTask
             extends
             GoogleMapsEngineAbstractUploader<Long, Integer, HashMap<String, String>> {
@@ -382,13 +386,13 @@ public class GoogleMapsEngineUploaderActivity extends Activity implements
 
             mResults = new HashMap<String, String>();
 
-            String selection = InstanceColumns._ID + "=?";
+            String selection = InstanceProviderAPI.InstanceColumns._ID + "=?";
             String[] selectionArgs = new String[(values == null) ? 0
                     : values.length];
             if (values != null) {
                 for (int i = 0; i < values.length; i++) {
                     if (i != values.length - 1) {
-                        selection += " or " + InstanceColumns._ID + "=?";
+                        selection += " or " + InstanceProviderAPI.InstanceColumns._ID + "=?";
                     }
                     selectionArgs[i] = values[i].toString();
                 }
@@ -432,11 +436,6 @@ public class GoogleMapsEngineUploaderActivity extends Activity implements
             uploadInstances(selection, selectionArgs, token);
             return mResults;
         }
-    }
-
-    @Override
-    public void authRequest(Uri url, HashMap<String, String> doneSoFar) {
-        // this shouldn't be in the interface...
     }
 
 }

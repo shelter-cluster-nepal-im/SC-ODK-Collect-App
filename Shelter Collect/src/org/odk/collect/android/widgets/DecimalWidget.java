@@ -14,17 +14,17 @@
 
 package org.odk.collect.android.widgets;
 
-import java.text.NumberFormat;
-
-import org.javarosa.core.model.data.DecimalData;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.form.api.FormEntryPrompt;
-
 import android.content.Context;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.method.DigitsKeyListener;
 import android.util.TypedValue;
+
+import org.javarosa.core.model.data.DecimalData;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.form.api.FormEntryPrompt;
+
+import java.text.NumberFormat;
 
 /**
  * A widget that restricts values to floating point numbers.
@@ -32,22 +32,6 @@ import android.util.TypedValue;
  * @author Carl Hartung (carlhartung@gmail.com)
  */
 public class DecimalWidget extends StringWidget {
-
-    private Double getDoubleAnswerValue() {
-        IAnswerData dataHolder = mPrompt.getAnswerValue();
-        Double d = null;
-        if (dataHolder != null) {
-            Object dataValue = dataHolder.getValue();
-            if (dataValue != null) {
-                if (dataValue instanceof Integer) {
-                    d = Double.valueOf(((Integer) dataValue).intValue());
-                } else {
-                    d = (Double) dataValue;
-                }
-            }
-        }
-        return d;
-    }
 
     public DecimalWidget(Context context, FormEntryPrompt prompt, boolean readOnlyOverride) {
         super(context, prompt, readOnlyOverride, true);
@@ -91,6 +75,21 @@ public class DecimalWidget extends StringWidget {
         setupChangeListener();
     }
 
+    private Double getDoubleAnswerValue() {
+        IAnswerData dataHolder = mPrompt.getAnswerValue();
+        Double d = null;
+        if (dataHolder != null) {
+            Object dataValue = dataHolder.getValue();
+            if (dataValue != null) {
+                if (dataValue instanceof Integer) {
+                    d = Double.valueOf(((Integer) dataValue).intValue());
+                } else {
+                    d = (Double) dataValue;
+                }
+            }
+        }
+        return d;
+    }
 
     @Override
     public IAnswerData getAnswer() {

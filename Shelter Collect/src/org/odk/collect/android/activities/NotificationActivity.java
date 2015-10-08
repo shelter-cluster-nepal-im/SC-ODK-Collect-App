@@ -1,14 +1,13 @@
-
 package org.odk.collect.android.activities;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
 
 import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.TypedValue;
 import android.widget.TextView;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
 
 public class NotificationActivity extends Activity {
 

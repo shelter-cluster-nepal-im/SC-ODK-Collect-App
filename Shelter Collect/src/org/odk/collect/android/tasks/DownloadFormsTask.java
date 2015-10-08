@@ -14,15 +14,11 @@
 
 package org.odk.collect.android.tasks;
 
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.zip.GZIPInputStream;
+import android.content.ContentValues;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.util.Log;
 
 import org.javarosa.xform.parse.XFormParser;
 import org.kxml2.kdom.Element;
@@ -31,7 +27,7 @@ import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.exception.TaskCancelledException;
 import org.odk.collect.android.listeners.FormDownloaderListener;
 import org.odk.collect.android.logic.FormDetails;
-import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
+import org.odk.collect.android.provider.FormsProviderAPI;
 import org.odk.collect.android.utilities.DocumentFetchResult;
 import org.odk.collect.android.utilities.FileUtils;
 import org.odk.collect.android.utilities.WebUtils;
@@ -43,11 +39,19 @@ import org.opendatakit.httpclientandroidlib.client.HttpClient;
 import org.opendatakit.httpclientandroidlib.client.methods.HttpGet;
 import org.opendatakit.httpclientandroidlib.protocol.HttpContext;
 
-import android.content.ContentValues;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.util.Log;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Background task for downloading a given list of forms. We assume right now that the forms are
@@ -64,11 +68,9 @@ public class DownloadFormsTask extends
 
     private static final String MD5_COLON_PREFIX = "md5:";
     private static final String TEMP_DOWNLOAD_EXTENSION = ".tempDownload";
-
-    private FormDownloaderListener mStateListener;
-
     private static final String NAMESPACE_OPENROSA_ORG_XFORMS_XFORMS_MANIFEST =
             "http://openrosa.org/xforms/xformsManifest";
+    private FormDownloaderListener mStateListener;
 
     private boolean isXformsManifestNamespacedElement(Element e) {
         return e.getNamespace().equalsIgnoreCase(NAMESPACE_OPENROSA_ORG_XFORMS_XFORMS_MANIFEST);
@@ -214,7 +216,7 @@ public class DownloadFormsTask extends
      * Checks a form file whether it is a new one or if it matches an old one.
      *
      * @param formFile the form definition file
-     * @return a {@link org.odk.collect.android.tasks.DownloadFormsTask.UriResult} object
+     * @return a {@link DownloadFormsTask.UriResult} object
      * @throws TaskCancelledException if the user cancels the task during the download.
      */
     private UriResult findExistingOrCreateNewUri(File formFile) throws TaskCancelledException {
@@ -231,10 +233,10 @@ public class DownloadFormsTask extends
             String[] selectionArgs = {
                     formFile.getAbsolutePath()
             };
-            String selection = FormsColumns.FORM_FILE_PATH + "=?";
+            String selection = FormsProviderAPI.FormsColumns.FORM_FILE_PATH + "=?";
             cursor = Collect.getInstance()
                     .getContentResolver()
-                    .query(FormsColumns.CONTENT_URI, null, selection, selectionArgs,
+                    .query(FormsProviderAPI.FormsColumns.CONTENT_URI, null, selection, selectionArgs,
                             null);
 
             isNew = cursor.getCount() <= 0;
@@ -243,8 +245,8 @@ public class DownloadFormsTask extends
                 // doesn't exist, so insert it
                 ContentValues v = new ContentValues();
 
-                v.put(FormsColumns.FORM_FILE_PATH, formFilePath);
-                v.put(FormsColumns.FORM_MEDIA_PATH, mediaPath);
+                v.put(FormsProviderAPI.FormsColumns.FORM_FILE_PATH, formFilePath);
+                v.put(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH, mediaPath);
 
                 Log.w(t, "Parsing document " + formFile.getAbsolutePath());
 
@@ -254,22 +256,22 @@ public class DownloadFormsTask extends
                     throw new TaskCancelledException(formFile, "Form " + formFile.getName() + " was cancelled while it was being parsed.");
                 }
 
-                v.put(FormsColumns.DISPLAY_NAME, formInfo.get(FileUtils.TITLE));
-                v.put(FormsColumns.JR_VERSION, formInfo.get(FileUtils.VERSION));
-                v.put(FormsColumns.JR_FORM_ID, formInfo.get(FileUtils.FORMID));
-                v.put(FormsColumns.SUBMISSION_URI, formInfo.get(FileUtils.SUBMISSIONURI));
-                v.put(FormsColumns.BASE64_RSA_PUBLIC_KEY, formInfo.get(FileUtils.BASE64_RSA_PUBLIC_KEY));
+                v.put(FormsProviderAPI.FormsColumns.DISPLAY_NAME, formInfo.get(FileUtils.TITLE));
+                v.put(FormsProviderAPI.FormsColumns.JR_VERSION, formInfo.get(FileUtils.VERSION));
+                v.put(FormsProviderAPI.FormsColumns.JR_FORM_ID, formInfo.get(FileUtils.FORMID));
+                v.put(FormsProviderAPI.FormsColumns.SUBMISSION_URI, formInfo.get(FileUtils.SUBMISSIONURI));
+                v.put(FormsProviderAPI.FormsColumns.BASE64_RSA_PUBLIC_KEY, formInfo.get(FileUtils.BASE64_RSA_PUBLIC_KEY));
                 uri =
                         Collect.getInstance().getContentResolver()
-                                .insert(FormsColumns.CONTENT_URI, v);
+                                .insert(FormsProviderAPI.FormsColumns.CONTENT_URI, v);
                 Collect.getInstance().getActivityLogger().logAction(this, "insert", formFile.getAbsolutePath());
 
             } else {
                 cursor.moveToFirst();
                 uri =
-                        Uri.withAppendedPath(FormsColumns.CONTENT_URI,
-                                cursor.getString(cursor.getColumnIndex(FormsColumns._ID)));
-                mediaPath = cursor.getString(cursor.getColumnIndex(FormsColumns.FORM_MEDIA_PATH));
+                        Uri.withAppendedPath(FormsProviderAPI.FormsColumns.CONTENT_URI,
+                                cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns._ID)));
+                mediaPath = cursor.getString(cursor.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_MEDIA_PATH));
                 Collect.getInstance().getActivityLogger().logAction(this, "refresh", formFile.getAbsolutePath());
             }
         } finally {
@@ -313,17 +315,17 @@ public class DownloadFormsTask extends
         // we've downloaded the file, and we may have renamed it
         // make sure it's not the same as a file we already have
         String[] projection = {
-                FormsColumns.FORM_FILE_PATH
+                FormsProviderAPI.FormsColumns.FORM_FILE_PATH
         };
         String[] selectionArgs = {
                 FileUtils.getMd5Hash(f)
         };
-        String selection = FormsColumns.MD5_HASH + "=?";
+        String selection = FormsProviderAPI.FormsColumns.MD5_HASH + "=?";
 
         Cursor c = null;
         try {
             c = Collect.getInstance().getContentResolver()
-                    .query(FormsColumns.CONTENT_URI, projection, selection, selectionArgs, null);
+                    .query(FormsProviderAPI.FormsColumns.CONTENT_URI, projection, selection, selectionArgs, null);
             if (c.getCount() > 0) {
                 // Should be at most, 1
                 c.moveToFirst();
@@ -335,7 +337,7 @@ public class DownloadFormsTask extends
                 FileUtils.deleteAndReport(f);
 
                 // set the file returned to the file we already had
-                String existingPath = c.getString(c.getColumnIndex(FormsColumns.FORM_FILE_PATH));
+                String existingPath = c.getString(c.getColumnIndex(FormsProviderAPI.FormsColumns.FORM_FILE_PATH));
                 f = new File(existingPath);
                 Log.w(t, "Will use " + existingPath);
             }
@@ -491,64 +493,6 @@ public class DownloadFormsTask extends
         }
     }
 
-    private static class UriResult {
-
-        private final Uri uri;
-        private final String mediaPath;
-        private final boolean isNew;
-
-        private UriResult(Uri uri, String mediaPath, boolean aNew) {
-            this.uri = uri;
-            this.mediaPath = mediaPath;
-            this.isNew = aNew;
-        }
-
-        private Uri getUri() {
-            return uri;
-        }
-
-        private String getMediaPath() {
-            return mediaPath;
-        }
-
-        private boolean isNew() {
-            return isNew;
-        }
-    }
-
-    private static class FileResult {
-
-        private final File file;
-        private final boolean isNew;
-
-        private FileResult(File file, boolean aNew) {
-            this.file = file;
-            isNew = aNew;
-        }
-
-        private File getFile() {
-            return file;
-        }
-
-        private boolean isNew() {
-            return isNew;
-        }
-    }
-
-    private static class MediaFile {
-        final String filename;
-        final String hash;
-        final String downloadUrl;
-
-
-        MediaFile(String filename, String hash, String downloadUrl) {
-            this.filename = filename;
-            this.hash = hash;
-            this.downloadUrl = downloadUrl;
-        }
-    }
-
-
     private String downloadManifestAndMediaFiles(String tempMediaPath, String finalMediaPath, FormDetails fd, int count,
                                                  int total) throws Exception {
         if (fd.manifestUrl == null)
@@ -695,7 +639,6 @@ public class DownloadFormsTask extends
         return null;
     }
 
-
     @Override
     protected void onPostExecute(HashMap<FormDetails, String> value) {
         synchronized (this) {
@@ -704,7 +647,6 @@ public class DownloadFormsTask extends
             }
         }
     }
-
 
     @Override
     protected void onProgressUpdate(String... values) {
@@ -719,10 +661,66 @@ public class DownloadFormsTask extends
 
     }
 
-
     public void setDownloaderListener(FormDownloaderListener sl) {
         synchronized (this) {
             mStateListener = sl;
+        }
+    }
+
+    private static class UriResult {
+
+        private final Uri uri;
+        private final String mediaPath;
+        private final boolean isNew;
+
+        private UriResult(Uri uri, String mediaPath, boolean aNew) {
+            this.uri = uri;
+            this.mediaPath = mediaPath;
+            this.isNew = aNew;
+        }
+
+        private Uri getUri() {
+            return uri;
+        }
+
+        private String getMediaPath() {
+            return mediaPath;
+        }
+
+        private boolean isNew() {
+            return isNew;
+        }
+    }
+
+    private static class FileResult {
+
+        private final File file;
+        private final boolean isNew;
+
+        private FileResult(File file, boolean aNew) {
+            this.file = file;
+            isNew = aNew;
+        }
+
+        private File getFile() {
+            return file;
+        }
+
+        private boolean isNew() {
+            return isNew;
+        }
+    }
+
+    private static class MediaFile {
+        final String filename;
+        final String hash;
+        final String downloadUrl;
+
+
+        MediaFile(String filename, String hash, String downloadUrl) {
+            this.filename = filename;
+            this.hash = hash;
+            this.downloadUrl = downloadUrl;
         }
     }
 

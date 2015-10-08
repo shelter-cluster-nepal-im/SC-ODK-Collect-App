@@ -14,17 +14,6 @@
 
 package org.odk.collect.android.activities;
 
-import java.util.ArrayList;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.DeleteFormsListener;
-import org.odk.collect.android.listeners.DiskSyncListener;
-import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
-import org.odk.collect.android.tasks.DeleteFormsTask;
-import org.odk.collect.android.tasks.DiskSyncTask;
-import org.odk.collect.android.utilities.VersionHidingCursorAdapter;
-
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -40,6 +29,17 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.DeleteFormsListener;
+import org.odk.collect.android.listeners.DiskSyncListener;
+import org.odk.collect.android.provider.FormsProviderAPI;
+import org.odk.collect.android.tasks.DeleteFormsTask;
+import org.odk.collect.android.tasks.DiskSyncTask;
+import org.odk.collect.android.utilities.VersionHidingCursorAdapter;
+
+import java.util.ArrayList;
+
 /**
  * Responsible for displaying and deleting all the valid forms in the forms
  * directory.
@@ -49,27 +49,15 @@ import android.widget.Toast;
  */
 public class FormManagerList extends ListActivity implements DiskSyncListener,
         DeleteFormsListener {
-    private static String t = "FormManagerList";
     private static final String SELECTED = "selected";
     private static final String syncMsgKey = "syncmsgkey";
-
+    private static String t = "FormManagerList";
+    BackgroundTasks mBackgroundTasks; // handed across orientation changes
     private AlertDialog mAlertDialog;
     private Button mDeleteButton;
     private Button mToggleButton;
-
     private SimpleCursorAdapter mInstances;
     private ArrayList<Long> mSelected = new ArrayList<Long>();
-
-    static class BackgroundTasks {
-        DiskSyncTask mDiskSyncTask = null;
-        DeleteFormsTask mDeleteFormsTask = null;
-
-        BackgroundTasks() {
-        }
-
-    }
-
-    BackgroundTasks mBackgroundTasks; // handed across orientation changes
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -119,15 +107,15 @@ public class FormManagerList extends ListActivity implements DiskSyncListener,
             }
         });
 
-        String sortOrder = FormsColumns.DISPLAY_NAME + " ASC, " + FormsColumns.JR_VERSION + " DESC";
-        Cursor c = managedQuery(FormsColumns.CONTENT_URI, null, null, null, sortOrder);
+        String sortOrder = FormsProviderAPI.FormsColumns.DISPLAY_NAME + " ASC, " + FormsProviderAPI.FormsColumns.JR_VERSION + " DESC";
+        Cursor c = managedQuery(FormsProviderAPI.FormsColumns.CONTENT_URI, null, null, null, sortOrder);
 
-        String[] data = new String[]{FormsColumns.DISPLAY_NAME,
-                FormsColumns.DISPLAY_SUBTEXT, FormsColumns.JR_VERSION};
+        String[] data = new String[]{FormsProviderAPI.FormsColumns.DISPLAY_NAME,
+                FormsProviderAPI.FormsColumns.DISPLAY_SUBTEXT, FormsProviderAPI.FormsColumns.JR_VERSION};
         int[] view = new int[]{R.id.text1, R.id.text2, R.id.text3};
 
         // render total instance view
-        mInstances = new VersionHidingCursorAdapter(FormsColumns.JR_VERSION, this,
+        mInstances = new VersionHidingCursorAdapter(FormsProviderAPI.FormsColumns.JR_VERSION, this,
                 R.layout.two_item_multiple_choice, c, data, view);
         setListAdapter(mInstances);
         getListView().setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
@@ -276,7 +264,7 @@ public class FormManagerList extends ListActivity implements DiskSyncListener,
 
         // get row id from db
         Cursor c = (Cursor) getListAdapter().getItem(position);
-        long k = c.getLong(c.getColumnIndex(FormsColumns._ID));
+        long k = c.getLong(c.getColumnIndex(FormsProviderAPI.FormsColumns._ID));
 
         // add/remove from selected list
         if (mSelected.contains(k))
@@ -323,5 +311,14 @@ public class FormManagerList extends ListActivity implements DiskSyncListener,
             getListView().setItemChecked(i, false);
         }
         mDeleteButton.setEnabled(false);
+    }
+
+    static class BackgroundTasks {
+        DiskSyncTask mDiskSyncTask = null;
+        DeleteFormsTask mDeleteFormsTask = null;
+
+        BackgroundTasks() {
+        }
+
     }
 }

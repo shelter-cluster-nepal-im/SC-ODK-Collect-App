@@ -15,15 +15,6 @@
 
 package org.odk.collect.android.activities;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.utilities.ColorPickerDialog;
-import org.odk.collect.android.utilities.FileUtils;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -49,6 +40,15 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.utilities.ColorPickerDialog;
+import org.odk.collect.android.utilities.FileUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 /**
  * Modified from the FingerPaint example found in The Android Open Source
@@ -442,6 +442,7 @@ public class DrawActivity extends Activity {
         private Path mCurrentPath;
         private Paint mBitmapPaint;
         private File mBackgroundBitmapFile;
+        private float mX, mY;
 
         public DrawView(final Context c) {
             super(c);
@@ -496,8 +497,6 @@ public class DrawActivity extends Activity {
             canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
             canvas.drawPath(mCurrentPath, paint);
         }
-
-        private float mX, mY;
 
         private void touch_start(float x, float y) {
             mCurrentPath.reset();

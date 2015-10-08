@@ -14,21 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import java.io.File;
-import java.util.List;
-
-import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.reference.InvalidReferenceException;
-import org.javarosa.core.reference.ReferenceManager;
-import org.javarosa.form.api.FormEntryCaption;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.xpath.expr.XPathFuncExpr;
-import org.odk.collect.android.R;
-import org.odk.collect.android.external.ExternalDataUtil;
-import org.odk.collect.android.external.ExternalSelectChoice;
-import org.odk.collect.android.utilities.FileUtils;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
@@ -43,6 +28,21 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.ReferenceManager;
+import org.javarosa.form.api.FormEntryCaption;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.xpath.expr.XPathFuncExpr;
+import org.odk.collect.android.R;
+import org.odk.collect.android.external.ExternalDataUtil;
+import org.odk.collect.android.external.ExternalSelectChoice;
+import org.odk.collect.android.utilities.FileUtils;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * The Label Widget does not return an answer. The purpose of this widget is to be the top entry in
@@ -93,7 +93,7 @@ public class LabelWidget extends QuestionWidget {
                 mImageView = null;
                 mMissingImage = null;
 
-                final int labelId = QuestionWidget.newUniqueId();
+                final int labelId = newUniqueId();
 
                 // Now set up the image view
                 String errorMsg = null;
@@ -192,7 +192,7 @@ public class LabelWidget extends QuestionWidget {
 
         // Align the buttons so that they appear horizonally and are right justified
         // buttonLayout.setGravity(Gravity.RIGHT);
-        buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+        buttonLayout.setOrientation(HORIZONTAL);
         // LinearLayout.LayoutParams params = new
         // LinearLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
         // buttonLayout.setLayoutParams(params);
@@ -239,7 +239,7 @@ public class LabelWidget extends QuestionWidget {
         mQuestionText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
         mQuestionText.setTypeface(null, Typeface.BOLD);
         mQuestionText.setPadding(0, 0, 0, 7);
-        mQuestionText.setId(QuestionWidget.newUniqueId()); // assign random id
+        mQuestionText.setId(newUniqueId()); // assign random id
 
         // Wrap to the size of the parent view
         mQuestionText.setHorizontallyScrolling(false);
@@ -254,7 +254,7 @@ public class LabelWidget extends QuestionWidget {
         labelParams.weight = 1;
 
         questionLayout = new LinearLayout(getContext());
-        questionLayout.setOrientation(LinearLayout.HORIZONTAL);
+        questionLayout.setOrientation(HORIZONTAL);
 
         questionLayout.addView(mQuestionText, labelParams);
     }

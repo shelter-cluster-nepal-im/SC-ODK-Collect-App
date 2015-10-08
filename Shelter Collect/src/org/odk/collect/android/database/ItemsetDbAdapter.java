@@ -1,11 +1,4 @@
-
 package org.odk.collect.android.database;
-
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
-import org.odk.collect.android.application.Collect;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -13,65 +6,47 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import org.odk.collect.android.application.Collect;
+
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class ItemsetDbAdapter {
 
     public static final String KEY_ID = "_id";
 
     private static final String TAG = "ItemsetDbAdapter";
-    private DatabaseHelper mDbHelper;
-    private SQLiteDatabase mDb;
-
     private static final String DATABASE_NAME = "itemsets.db";
     private static final String DATABASE_TABLE = "itemset_";
     private static final int DATABASE_VERSION = 2;
-
     private static final String ITEMSET_TABLE = "itemsets";
     private static final String KEY_ITEMSET_HASH = "hash";
     private static final String KEY_PATH = "path";
-
     private static final String CREATE_ITEMSET_TABLE =
             "create table " + ITEMSET_TABLE + " (_id integer primary key autoincrement, "
                     + KEY_ITEMSET_HASH + " text, "
                     + KEY_PATH + " text "
                     + ");";
-
-    /**
-     * This class helps open, create, and upgrade the database file.
-     */
-    private static class DatabaseHelper extends ODKSQLiteOpenHelper {
-        DatabaseHelper() {
-            super(Collect.METADATA_PATH, DATABASE_NAME, null, DATABASE_VERSION);
-        }
-
-        @Override
-        public void onCreate(SQLiteDatabase db) {
-            // create table to keep track of the itemsets
-            db.execSQL(CREATE_ITEMSET_TABLE);
-
-        }
-
-        @Override
-        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
-                    + newVersion + ", which will destroy all old data");
-            // first drop all of our generated itemset tables
-            Cursor c = db.query(ITEMSET_TABLE, null, null, null, null, null, null);
-            if (c != null) {
-                c.move(-1);
-                while (c.moveToNext()) {
-                    String table = c.getString(c.getColumnIndex(KEY_ITEMSET_HASH));
-                    db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE + table);
-                }
-                c.close();
-            }
-
-            // then drop the table tracking itemsets itself
-            db.execSQL("DROP TABLE IF EXISTS " + ITEMSET_TABLE);
-            onCreate(db);
-        }
-    }
+    private DatabaseHelper mDbHelper;
+    private SQLiteDatabase mDb;
 
     public ItemsetDbAdapter() {
+    }
+
+    public static String getMd5FromString(String toEncode) {
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            Log.e("MD5", e.getMessage());
+        }
+        md.update(toEncode.getBytes());
+        byte[] digest = md.digest();
+        BigInteger bigInt = new BigInteger(1, digest);
+        String hashtext = bigInt.toString(16);
+        return hashtext;
     }
 
     /**
@@ -202,19 +177,40 @@ public class ItemsetDbAdapter {
         mDb.delete(ITEMSET_TABLE, where, whereArgs);
     }
 
-    public static String getMd5FromString(String toEncode) {
-        MessageDigest md = null;
-        try {
-            md = MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            Log.e("MD5", e.getMessage());
+    /**
+     * This class helps open, create, and upgrade the database file.
+     */
+    private static class DatabaseHelper extends ODKSQLiteOpenHelper {
+        DatabaseHelper() {
+            super(Collect.METADATA_PATH, DATABASE_NAME, null, DATABASE_VERSION);
         }
-        md.update(toEncode.getBytes());
-        byte[] digest = md.digest();
-        BigInteger bigInt = new BigInteger(1, digest);
-        String hashtext = bigInt.toString(16);
-        return hashtext;
+
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            // create table to keep track of the itemsets
+            db.execSQL(CREATE_ITEMSET_TABLE);
+
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
+                    + newVersion + ", which will destroy all old data");
+            // first drop all of our generated itemset tables
+            Cursor c = db.query(ITEMSET_TABLE, null, null, null, null, null, null);
+            if (c != null) {
+                c.move(-1);
+                while (c.moveToNext()) {
+                    String table = c.getString(c.getColumnIndex(KEY_ITEMSET_HASH));
+                    db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE + table);
+                }
+                c.close();
+            }
+
+            // then drop the table tracking itemsets itself
+            db.execSQL("DROP TABLE IF EXISTS " + ITEMSET_TABLE);
+            onCreate(db);
+        }
     }
 
 }

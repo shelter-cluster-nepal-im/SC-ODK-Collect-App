@@ -12,7 +12,11 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import org.odk.collect.android.R;
+import org.odk.collect.android.provider.Post_New_ag_Request;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,7 +38,7 @@ public class RequestAccess extends Activity {
         setContentView(R.layout.request_access);
     }
 
-    public void processForm(View v) {
+    public void processForm(View v) throws IOException {
         setupVariables();
         boolean fnameFlag = false;
         boolean emailFlag = false;
@@ -72,6 +76,15 @@ public class RequestAccess extends Activity {
         }
 
         if (fnameFlag && emailFlag && agencyFlag && desigFlag && dropDownFlag) {
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("name", fullname.getText().toString().trim());
+            map.put("email", email.getText().toString().trim());
+            map.put("agency_name", agencyName.getText().toString().trim());
+            map.put("designation", desig.getText().toString().trim());
+            map.put("deployment", dropdownValue.trim());
+            Post_New_ag_Request m = new Post_New_ag_Request();
+            int resp = m.send_request("http://52.3.170.125:5000/ag_request/", "shelter_cluster", "shelter_cluster!", map);
+            Log.d("GPTest", String.valueOf(resp));
             Toast.makeText(getApplicationContext(),
                     "Thank you, Form Subbmited", Toast.LENGTH_SHORT)
                     .show();

@@ -14,9 +14,23 @@
 
 package org.odk.collect.android.widgets;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Typeface;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
@@ -33,24 +47,9 @@ import org.odk.collect.android.external.ExternalDataUtil;
 import org.odk.collect.android.external.ExternalSelectChoice;
 import org.odk.collect.android.utilities.FileUtils;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Typeface;
-import android.util.Log;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.View;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ListWidget handles select-one fields using radio buttons. The radio buttons are aligned
@@ -97,7 +96,7 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
             for (int i = 0; i < mItems.size(); i++) {
                 RadioButton r = new RadioButton(getContext());
 
-                r.setId(QuestionWidget.newUniqueId());
+                r.setId(newUniqueId());
                 r.setTag(Integer.valueOf(i));
                 r.setEnabled(!prompt.isReadOnly());
                 r.setFocusable(!prompt.isReadOnly());
@@ -120,7 +119,7 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
                 ImageView mImageView = null;
                 TextView mMissingImage = null;
 
-                final int labelId = QuestionWidget.newUniqueId();
+                final int labelId = newUniqueId();
 
                 // Now set up the image view
                 String errorMsg = null;
@@ -188,7 +187,7 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
                 label.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
                 label.setGravity(Gravity.CENTER_HORIZONTAL);
                 if (!displayLabel) {
-                    label.setVisibility(View.GONE);
+                    label.setVisibility(GONE);
                 }
 
                 // answer layout holds the label text/image on top and the radio button on bottom
@@ -205,7 +204,7 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
                 if (mImageView != null) {
                     mImageView.setScaleType(ScaleType.CENTER);
                     if (!displayLabel) {
-                        mImageView.setVisibility(View.GONE);
+                        mImageView.setVisibility(GONE);
                     }
                     answer.addView(mImageView, headerParams);
                 } else if (mMissingImage != null) {
@@ -236,7 +235,7 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
 
         // Align the buttons so that they appear horizonally and are right justified
         // buttonLayout.setGravity(Gravity.RIGHT);
-        buttonLayout.setOrientation(LinearLayout.HORIZONTAL);
+        buttonLayout.setOrientation(HORIZONTAL);
         // LinearLayout.LayoutParams params = new
         // LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         // buttonLayout.setLayoutParams(params);
@@ -324,7 +323,7 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
         questionText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
         questionText.setTypeface(null, Typeface.BOLD);
         questionText.setPadding(0, 0, 0, 7);
-        questionText.setId(QuestionWidget.newUniqueId()); // assign random id
+        questionText.setId(newUniqueId()); // assign random id
 
         // Wrap to the size of the parent view
         questionText.setHorizontallyScrolling(false);
@@ -339,7 +338,7 @@ public class ListWidget extends QuestionWidget implements OnCheckedChangeListene
         labelParams.weight = 1;
 
         questionLayout = new LinearLayout(getContext());
-        questionLayout.setOrientation(LinearLayout.HORIZONTAL);
+        questionLayout.setOrientation(HORIZONTAL);
 
         questionLayout.addView(questionText, labelParams);
     }

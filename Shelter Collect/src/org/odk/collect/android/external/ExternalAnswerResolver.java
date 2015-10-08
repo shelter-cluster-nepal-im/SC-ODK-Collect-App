@@ -18,8 +18,7 @@
 
 package org.odk.collect.android.external;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.util.Log;
 
 import org.javarosa.core.model.Constants;
 import org.javarosa.core.model.FormDef;
@@ -36,7 +35,8 @@ import org.javarosa.xform.parse.XFormParser;
 import org.javarosa.xform.util.XFormAnswerDataSerializer;
 import org.javarosa.xpath.expr.XPathFuncExpr;
 
-import android.util.Log;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author: Meletis Margaritis

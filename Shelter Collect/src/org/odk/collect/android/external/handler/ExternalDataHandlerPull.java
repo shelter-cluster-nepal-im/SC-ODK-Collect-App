@@ -18,8 +18,9 @@
 
 package org.odk.collect.android.external.handler;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import org.javarosa.core.model.condition.EvaluationContext;
 import org.javarosa.xpath.expr.XPathFuncExpr;
@@ -27,9 +28,8 @@ import org.odk.collect.android.external.ExternalDataManager;
 import org.odk.collect.android.external.ExternalDataUtil;
 import org.odk.collect.android.external.ExternalSQLiteOpenHelper;
 
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Author: Meletis Margaritis

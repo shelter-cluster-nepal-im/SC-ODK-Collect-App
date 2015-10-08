@@ -14,9 +14,14 @@
 
 package org.odk.collect.android.widgets;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
+import android.content.Context;
+import android.database.Cursor;
+import android.view.KeyEvent;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.CompoundButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import org.javarosa.core.model.FormDef;
 import org.javarosa.core.model.condition.EvaluationContext;
@@ -32,15 +37,9 @@ import org.odk.collect.android.R;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.database.ItemsetDbAdapter;
 
-import android.content.Context;
-import android.database.Cursor;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.CompoundButton;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * The most basic widget that allows for entry of any text.
@@ -52,9 +51,8 @@ public class ItemsetWidget extends QuestionWidget implements
         android.widget.CompoundButton.OnCheckedChangeListener {
 
     private static String tag = "ItemsetWidget";
-
-    boolean mReadOnly;
     protected RadioGroup mButtons;
+    boolean mReadOnly;
     private String mAnswer = null;
     // Hashmap linking label:value
     private HashMap<String, String> mAnswers;
@@ -67,7 +65,7 @@ public class ItemsetWidget extends QuestionWidget implements
                             boolean derived) {
         super(context, prompt);
         mButtons = new RadioGroup(context);
-        mButtons.setId(QuestionWidget.newUniqueId());
+        mButtons.setId(newUniqueId());
         mReadOnly = prompt.isReadOnly() || readOnlyOverride;
         mAnswers = new HashMap<String, String>();
 

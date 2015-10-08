@@ -14,44 +14,6 @@
 
 package org.odk.collect.android.activities;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-
-import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.instance.TreeElement;
-import org.javarosa.form.api.FormEntryCaption;
-import org.javarosa.form.api.FormEntryController;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.exception.JavaRosaException;
-import org.odk.collect.android.listeners.AdvanceToNextListener;
-import org.odk.collect.android.listeners.FormLoaderListener;
-import org.odk.collect.android.listeners.FormSavedListener;
-import org.odk.collect.android.listeners.SavePointListener;
-import org.odk.collect.android.logic.FormController;
-import org.odk.collect.android.logic.FormController.FailedConstraint;
-import org.odk.collect.android.preferences.AdminPreferencesActivity;
-import org.odk.collect.android.preferences.PreferencesActivity;
-import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
-import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
-import org.odk.collect.android.tasks.FormLoaderTask;
-import org.odk.collect.android.tasks.SavePointTask;
-import org.odk.collect.android.tasks.SaveResult;
-import org.odk.collect.android.tasks.SaveToDiskTask;
-import org.odk.collect.android.utilities.CompatibilityUtils;
-import org.odk.collect.android.utilities.FileUtils;
-import org.odk.collect.android.utilities.MediaUtils;
-import org.odk.collect.android.views.ODKView;
-import org.odk.collect.android.widgets.QuestionWidget;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -91,7 +53,6 @@ import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -100,6 +61,44 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.instance.TreeElement;
+import org.javarosa.form.api.FormEntryCaption;
+import org.javarosa.form.api.FormEntryController;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.exception.JavaRosaException;
+import org.odk.collect.android.listeners.AdvanceToNextListener;
+import org.odk.collect.android.listeners.FormLoaderListener;
+import org.odk.collect.android.listeners.FormSavedListener;
+import org.odk.collect.android.listeners.SavePointListener;
+import org.odk.collect.android.logic.FormController;
+import org.odk.collect.android.logic.FormController.FailedConstraint;
+import org.odk.collect.android.preferences.AdminPreferencesActivity;
+import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.provider.FormsProviderAPI.FormsColumns;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
+import org.odk.collect.android.tasks.FormLoaderTask;
+import org.odk.collect.android.tasks.SavePointTask;
+import org.odk.collect.android.tasks.SaveResult;
+import org.odk.collect.android.tasks.SaveToDiskTask;
+import org.odk.collect.android.utilities.CompatibilityUtils;
+import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.utilities.MediaUtils;
+import org.odk.collect.android.views.ODKView;
+import org.odk.collect.android.widgets.QuestionWidget;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * FormEntryActivity is responsible for displaying questions, animating
@@ -111,20 +110,6 @@ import android.widget.Toast;
 public class FormEntryActivity extends Activity implements AnimationListener,
         FormLoaderListener, FormSavedListener, AdvanceToNextListener,
         OnGestureListener, SavePointListener {
-    private static final String t = "FormEntryActivity";
-
-    // save with every swipe forward or back. Timings indicate this takes .25
-    // seconds.
-    // if it ever becomes an issue, this value can be changed to save every n'th
-    // screen.
-    private static final int SAVEPOINT_INTERVAL = 1;
-
-    // Defines for FormEntryActivity
-    private static final boolean EXIT = true;
-    private static final boolean DO_NOT_EXIT = false;
-    private static final boolean EVALUATE_CONSTRAINTS = true;
-    private static final boolean DO_NOT_EVALUATE_CONSTRAINTS = false;
-
     // Request codes for returning data from specified intent.
     public static final int IMAGE_CAPTURE = 1;
     public static final int BARCODE_CAPTURE = 2;
@@ -145,31 +130,35 @@ public class FormEntryActivity extends Activity implements AnimationListener,
     public static final int BEARING_CAPTURE = 17;
     public static final int EX_GROUP_CAPTURE = 18;
     public static final int OSM_CAPTURE = 19;
-
     // Extra returned from gp activity
     public static final String LOCATION_RESULT = "LOCATION_RESULT";
     public static final String BEARING_RESULT = "BEARING_RESULT";
-
     public static final String KEY_INSTANCES = "instances";
     public static final String KEY_SUCCESS = "success";
     public static final String KEY_ERROR = "error";
-
     // Identifies the gp of the form used to launch form entry
     public static final String KEY_FORMPATH = "formpath";
-
-    // Identifies whether this is a new form, or reloading a form after a screen
-    // rotation (or similar)
-    private static final String NEWFORM = "newform";
-    // these are only processed if we shut down and are restoring after an
-    // external intent fires
-
     public static final String KEY_INSTANCEPATH = "instancepath";
     public static final String KEY_XPATH = "xpath";
     public static final String KEY_XPATH_WAITING_FOR_DATA = "xpathwaiting";
-
     // Tracks whether we are autosaving
     public static final String KEY_AUTO_SAVED = "autosaved";
-
+    private static final String t = "FormEntryActivity";
+    // save with every swipe forward or back. Timings indicate this takes .25
+    // seconds.
+    // if it ever becomes an issue, this value can be changed to save every n'th
+    // screen.
+    private static final int SAVEPOINT_INTERVAL = 1;
+    // Defines for FormEntryActivity
+    private static final boolean EXIT = true;
+    // these are only processed if we shut down and are restoring after an
+    // external intent fires
+    private static final boolean DO_NOT_EXIT = false;
+    private static final boolean EVALUATE_CONSTRAINTS = true;
+    private static final boolean DO_NOT_EVALUATE_CONSTRAINTS = false;
+    // Identifies whether this is a new form, or reloading a form after a screen
+    // rotation (or similar)
+    private static final String NEWFORM = "newform";
     private static final int MENU_LANGUAGES = Menu.FIRST;
     private static final int MENU_HIERARCHY_VIEW = Menu.FIRST + 1;
     private static final int MENU_SAVE = Menu.FIRST + 2;
@@ -177,30 +166,22 @@ public class FormEntryActivity extends Activity implements AnimationListener,
 
     private static final int PROGRESS_DIALOG = 1;
     private static final int SAVING_DIALOG = 2;
-
-    private boolean mAutoSaved;
-
     // Random ID
     private static final int DELETE_REPEAT = 654321;
-
+    private final Object saveDialogLock = new Object();
+    private boolean mAutoSaved;
     private String mFormPath;
     private GestureDetector mGestureDetector;
-
     private Animation mInAnimation;
     private Animation mOutAnimation;
     private View mStaleView = null;
-
     private LinearLayout mQuestionHolder;
     private View mCurrentView;
-
     private AlertDialog mAlertDialog;
     private ProgressDialog mProgressDialog;
     private String mErrorMessage;
-
     // used to limit forward/backward swipes to one per question
     private boolean mBeenSwiped = false;
-
-    private final Object saveDialogLock = new Object();
     private int viewCount = 0;
 
     private FormLoaderTask mFormLoaderTask;
@@ -210,12 +191,8 @@ public class FormEntryActivity extends Activity implements AnimationListener,
     private ImageButton mBackButton;
 
     private String stepMessage = "";
-
-    enum AnimationType {
-        LEFT, RIGHT, FADE
-    }
-
     private SharedPreferences mAdminPreferences;
+    private int mAnimationCompletionSet = 0;
 
     /**
      * Called when the activity is first created.
@@ -617,7 +594,7 @@ public class FormEntryActivity extends Activity implements AnimationListener,
             case SIGNATURE_CAPTURE:
             case IMAGE_CAPTURE:
             /*
-			 * We saved the image to the tempfile_path, but we really want it to
+             * We saved the image to the tempfile_path, but we really want it to
 			 * be in: /sdcard/odk/instances/[current instnace]/something.jpg so
 			 * we move it there before inserting it into the content provider.
 			 * Once the android image capture bug gets fixed, (read, we move on
@@ -2306,8 +2283,6 @@ public class FormEntryActivity extends Activity implements AnimationListener,
 
     }
 
-    private int mAnimationCompletionSet = 0;
-
     private void afterAllAnimations() {
         Log.i(t, "afterAllAnimations");
         if (mStaleView != null) {
@@ -2791,5 +2766,9 @@ public class FormEntryActivity extends Activity implements AnimationListener,
         if (errorMessage != null && errorMessage.trim().length() > 0) {
             Toast.makeText(this, getString(R.string.save_point_error, errorMessage), Toast.LENGTH_LONG).show();
         }
+    }
+
+    enum AnimationType {
+        LEFT, RIGHT, FADE
     }
 }

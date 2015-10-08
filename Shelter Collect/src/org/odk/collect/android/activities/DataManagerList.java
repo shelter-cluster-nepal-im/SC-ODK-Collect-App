@@ -14,14 +14,6 @@
 
 package org.odk.collect.android.activities;
 
-import java.util.ArrayList;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.listeners.DeleteInstancesListener;
-import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
-import org.odk.collect.android.tasks.DeleteInstancesTask;
-
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
@@ -36,6 +28,14 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.listeners.DeleteInstancesListener;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.collect.android.tasks.DeleteInstancesTask;
+
+import java.util.ArrayList;
+
 /**
  * Responsible for displaying and deleting all the valid forms in the forms
  * directory.
@@ -46,16 +46,13 @@ import android.widget.Toast;
 public class DataManagerList extends ListActivity implements
         DeleteInstancesListener {
     private static final String t = "DataManagerList";
+    private static final String SELECTED = "selected";
+    DeleteInstancesTask mDeleteInstancesTask = null;
     private AlertDialog mAlertDialog;
     private Button mDeleteButton;
     private Button mToggleButton;
-
     private SimpleCursorAdapter mInstances;
     private ArrayList<Long> mSelected = new ArrayList<Long>();
-
-    DeleteInstancesTask mDeleteInstancesTask = null;
-
-    private static final String SELECTED = "selected";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -104,11 +101,11 @@ public class DataManagerList extends ListActivity implements
             }
         });
 
-        Cursor c = managedQuery(InstanceColumns.CONTENT_URI, null, null, null,
-                InstanceColumns.DISPLAY_NAME + " ASC");
+        Cursor c = managedQuery(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, null, null,
+                InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " ASC");
 
-        String[] data = new String[]{InstanceColumns.DISPLAY_NAME,
-                InstanceColumns.DISPLAY_SUBTEXT};
+        String[] data = new String[]{InstanceProviderAPI.InstanceColumns.DISPLAY_NAME,
+                InstanceProviderAPI.InstanceColumns.DISPLAY_SUBTEXT};
         int[] view = new int[]{R.id.text1, R.id.text2};
 
         mInstances = new SimpleCursorAdapter(this,
@@ -239,7 +236,7 @@ public class DataManagerList extends ListActivity implements
 
         // get row id from db
         Cursor c = (Cursor) getListAdapter().getItem(position);
-        long k = c.getLong(c.getColumnIndex(InstanceColumns._ID));
+        long k = c.getLong(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
 
         // add/remove from selected list
         if (mSelected.contains(k))

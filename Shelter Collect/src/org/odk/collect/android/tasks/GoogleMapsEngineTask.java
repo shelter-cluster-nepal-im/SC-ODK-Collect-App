@@ -14,6 +14,22 @@
 
 package org.odk.collect.android.tasks;
 
+import android.content.Context;
+import android.os.AsyncTask;
+import android.util.Log;
+
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
+import org.odk.collect.android.listeners.InstanceUploaderListener;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -24,39 +40,29 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
 
-import org.odk.collect.android.listeners.InstanceUploaderListener;
-
-import android.content.Context;
-import android.os.AsyncTask;
-import android.util.Log;
-
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
-import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-
 /**
  * @author carlhartung (chartung@nafundi.com)
  */
 public abstract class GoogleMapsEngineTask<Params, Progress, Result> extends
         AsyncTask<Params, Progress, Result> {
 
-    private static String tag = "GoogleMapsEngineTask";
-
     public final static int PLAYSTORE_REQUEST_CODE = 55551;
     public final static int USER_RECOVERABLE_REQUEST_CODE = 55552;
-
     protected static final String gme_fail = "GME Error: ";
-
+    private static String tag = "GoogleMapsEngineTask";
     protected String mGoogleUserName = null;
     protected InstanceUploaderListener mStateListener;
+
+    protected static byte[] readStream(InputStream in) throws IOException {
+        final byte[] buf = new byte[1024];
+        int count = 0;
+        ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
+        while ((count = in.read(buf)) != -1) {
+            out.write(buf, 0, count);
+        }
+        in.close();
+        return out.toByteArray();
+    }
 
     public void setUserName(String username) {
         mGoogleUserName = username;
@@ -81,50 +87,6 @@ public abstract class GoogleMapsEngineTask<Params, Progress, Result> extends
 
         token = GoogleAuthUtil.getToken(context, mGoogleUserName, scope);
         return token;
-    }
-
-    protected static class Backoff {
-
-        private static final long INITIAL_WAIT = 1000 + new Random()
-                .nextInt(1000);
-        private static final long MAX_BACKOFF = 1800 * 1000;
-
-        private long mWaitInterval = INITIAL_WAIT;
-        private boolean mBackingOff = true;
-
-        public boolean shouldRetry() {
-            return mBackingOff;
-        }
-
-        private void noRetry() {
-            mBackingOff = false;
-        }
-
-        public void backoff() {
-            if (mWaitInterval > MAX_BACKOFF) {
-                noRetry();
-            } else if (mWaitInterval > 0) {
-                try {
-                    Thread.sleep(mWaitInterval);
-                } catch (InterruptedException e) {
-
-                }
-            }
-
-            mWaitInterval = (mWaitInterval == 0) ? INITIAL_WAIT
-                    : mWaitInterval * 2;
-        }
-    }
-
-    protected static byte[] readStream(InputStream in) throws IOException {
-        final byte[] buf = new byte[1024];
-        int count = 0;
-        ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
-        while ((count = in.read(buf)) != -1) {
-            out.write(buf, 0, count);
-        }
-        in.close();
-        return out.toByteArray();
     }
 
     protected String getErrorMesssage(InputStream is) {
@@ -165,6 +127,39 @@ public abstract class GoogleMapsEngineTask<Params, Progress, Result> extends
         return sb.toString();
     }
 
+    protected static class Backoff {
+
+        private static final long INITIAL_WAIT = 1000 + new Random()
+                .nextInt(1000);
+        private static final long MAX_BACKOFF = 1800 * 1000;
+
+        private long mWaitInterval = INITIAL_WAIT;
+        private boolean mBackingOff = true;
+
+        public boolean shouldRetry() {
+            return mBackingOff;
+        }
+
+        private void noRetry() {
+            mBackingOff = false;
+        }
+
+        public void backoff() {
+            if (mWaitInterval > MAX_BACKOFF) {
+                noRetry();
+            } else if (mWaitInterval > 0) {
+                try {
+                    Thread.sleep(mWaitInterval);
+                } catch (InterruptedException e) {
+
+                }
+            }
+
+            mWaitInterval = (mWaitInterval == 0) ? INITIAL_WAIT
+                    : mWaitInterval * 2;
+        }
+    }
+
     // FOR JSON
     public static class FeaturesListResponse {
         public Feature[] features;
@@ -189,26 +184,6 @@ public abstract class GoogleMapsEngineTask<Params, Progress, Result> extends
             coordinates[0] = lat;
             coordinates[1] = lon;
         }
-    }
-
-
-    public class GMEErrorResponse {
-        public GMEError error;
-    }
-
-    public class GMEError {
-        public GMEInnerError[] errors;
-        public String code;
-        public String message;
-        public String extendedHelp;
-    }
-
-    public class GMEInnerError {
-        public String domain;
-        public String reason;
-        public String message;
-        public String locationType;
-        public String location;
     }
 
     public static class Table {
@@ -269,6 +244,25 @@ public abstract class GoogleMapsEngineTask<Params, Progress, Result> extends
             json.add("features", jsonArray);
             return json;
         }
+    }
+
+    public class GMEErrorResponse {
+        public GMEError error;
+    }
+
+    public class GMEError {
+        public GMEInnerError[] errors;
+        public String code;
+        public String message;
+        public String extendedHelp;
+    }
+
+    public class GMEInnerError {
+        public String domain;
+        public String reason;
+        public String message;
+        public String locationType;
+        public String location;
     }
 
 }

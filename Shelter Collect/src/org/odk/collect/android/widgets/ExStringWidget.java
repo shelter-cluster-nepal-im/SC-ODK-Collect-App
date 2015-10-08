@@ -14,17 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import java.util.Map;
-
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.R;
-import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.exception.ExternalParamsException;
-import org.odk.collect.android.external.ExternalAppsUtils;
-
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -41,6 +30,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.Toast;
+
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
+import org.odk.collect.android.activities.FormEntryActivity;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.exception.ExternalParamsException;
+import org.odk.collect.android.external.ExternalAppsUtils;
+
+import java.util.Map;
 
 
 /**
@@ -87,12 +87,10 @@ import android.widget.Toast;
 public class ExStringWidget extends QuestionWidget implements IBinaryWidget {
 
     private final String t = getClass().getName();
-
+    protected EditText mAnswer;
     private boolean mHasExApp = true;
     private Button mLaunchIntentButton;
     private Drawable mTextBackground;
-
-    protected EditText mAnswer;
 
     public ExStringWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
@@ -240,7 +238,7 @@ public class ExStringWidget extends QuestionWidget implements IBinaryWidget {
                 mAnswer.requestFocus();
                 inputManager.showSoftInput(mAnswer, 0);
                 /*
-	             * If you do a multi-question screen after a "add another group" dialog, this won't
+                 * If you do a multi-question screen after a "add another group" dialog, this won't
 	             * automatically pop up. It's an Android issue.
 	             *
 	             * That is, if I have an edit text in an activity, and pop a dialog, and in that

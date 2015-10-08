@@ -21,22 +21,29 @@ import android.os.Parcelable;
 import com.google.api.client.util.DateTime;
 
 public class DriveListItem implements Comparable<DriveListItem>, Parcelable {
+    public static final int FILE = 1;
+    public static final int DIR = 2;
+    public static final int UP = 3;
+    public static final int MY_DRIVE = 4;
+    public static final int SHARED_WITH_ME = 5;
+    public static final Parcelable.Creator<DriveListItem> CREATOR = new Parcelable.Creator<DriveListItem>() {
+
+        public DriveListItem createFromParcel(Parcel pc) {
+            return new DriveListItem(pc);
+        }
+
+        public DriveListItem[] newArray(int size) {
+            return new DriveListItem[size];
+        }
+    };
     private String name;
     private String data;
     private String path;
     private String image;
     private String driveId;
     private String parentId;
-
     private DateTime date;
     private int type;
-
-
-    public static final int FILE = 1;
-    public static final int DIR = 2;
-    public static final int UP = 3;
-    public static final int MY_DRIVE = 4;
-    public static final int SHARED_WITH_ME = 5;
 
     public DriveListItem(String n, String d, DateTime dt, String p, String img, int type, String driveId, String parentId) {
         name = n;
@@ -47,6 +54,17 @@ public class DriveListItem implements Comparable<DriveListItem>, Parcelable {
         this.type = type;
         this.driveId = driveId;
         this.parentId = parentId;
+    }
+
+    public DriveListItem(Parcel pc) {
+        name = pc.readString();
+        data = pc.readString();
+        path = pc.readString();
+        image = pc.readString();
+        driveId = pc.readString();
+        parentId = pc.readString();
+        date = new DateTime(pc.readLong());
+        type = pc.readInt();
     }
 
     public String getName() {
@@ -106,26 +124,4 @@ public class DriveListItem implements Comparable<DriveListItem>, Parcelable {
         dest.writeLong(date.getValue());
         dest.writeInt(this.type);
     }
-
-    public DriveListItem(Parcel pc) {
-        name = pc.readString();
-        data = pc.readString();
-        path = pc.readString();
-        image = pc.readString();
-        driveId = pc.readString();
-        parentId = pc.readString();
-        date = new DateTime(pc.readLong());
-        type = pc.readInt();
-    }
-
-    public static final Parcelable.Creator<DriveListItem> CREATOR = new Parcelable.Creator<DriveListItem>() {
-
-        public DriveListItem createFromParcel(Parcel pc) {
-            return new DriveListItem(pc);
-        }
-
-        public DriveListItem[] newArray(int size) {
-            return new DriveListItem[size];
-        }
-    };
 }

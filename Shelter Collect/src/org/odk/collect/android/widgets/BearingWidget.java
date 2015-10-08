@@ -14,14 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.R;
-import org.odk.collect.android.activities.BearingActivity;
-import org.odk.collect.android.activities.FormEntryActivity;
-import org.odk.collect.android.application.Collect;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -30,9 +22,16 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TextView;
+
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
+import org.odk.collect.android.activities.BearingActivity;
+import org.odk.collect.android.activities.FormEntryActivity;
+import org.odk.collect.android.application.Collect;
 
 /**
  * BearingWidget is the widget that allows the user to get a compass heading.
@@ -47,13 +46,13 @@ public class BearingWidget extends QuestionWidget implements IBinaryWidget {
     public BearingWidget(Context context, FormEntryPrompt prompt) {
         super(context, prompt);
 
-        setOrientation(LinearLayout.VERTICAL);
+        setOrientation(VERTICAL);
 
         TableLayout.LayoutParams params = new TableLayout.LayoutParams();
         params.setMargins(7, 5, 7, 5);
 
         mGetBearingButton = new Button(getContext());
-        mGetBearingButton.setId(QuestionWidget.newUniqueId());
+        mGetBearingButton.setId(newUniqueId());
         mGetBearingButton.setPadding(20, 20, 20, 20);
         mGetBearingButton.setText(getContext()
                 .getString(R.string.get_bearing));
@@ -62,14 +61,14 @@ public class BearingWidget extends QuestionWidget implements IBinaryWidget {
         mGetBearingButton.setEnabled(!prompt.isReadOnly());
         mGetBearingButton.setLayoutParams(params);
         if (prompt.isReadOnly()) {
-            mGetBearingButton.setVisibility(View.GONE);
+            mGetBearingButton.setVisibility(GONE);
         }
 
         mStringAnswer = new TextView(getContext());
-        mStringAnswer.setId(QuestionWidget.newUniqueId());
+        mStringAnswer.setId(newUniqueId());
 
         mAnswerDisplay = new TextView(getContext());
-        mAnswerDisplay.setId(QuestionWidget.newUniqueId());
+        mAnswerDisplay.setId(newUniqueId());
         mAnswerDisplay
                 .setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mAnswerDisplay.setGravity(Gravity.CENTER);

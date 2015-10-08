@@ -14,11 +14,6 @@
 
 package org.odk.collect.android.preferences;
 
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.utilities.UrlUtils;
-import org.odk.collect.android.utilities.WebUtils;
-
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -31,6 +26,11 @@ import android.preference.PreferenceManager;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.widget.Toast;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.utilities.UrlUtils;
+import org.odk.collect.android.utilities.WebUtils;
 
 /**
  * Handles aggregate specific preferences.

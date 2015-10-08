@@ -14,27 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.javarosa.core.model.SelectChoice;
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.SelectMultiData;
-import org.javarosa.core.model.data.helper.Selection;
-import org.javarosa.core.reference.InvalidReferenceException;
-import org.javarosa.core.reference.ReferenceManager;
-import org.javarosa.form.api.FormEntryCaption;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.javarosa.xpath.expr.XPathFuncExpr;
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.external.ExternalDataUtil;
-import org.odk.collect.android.external.ExternalSelectChoice;
-import org.odk.collect.android.utilities.FileUtils;
-import org.odk.collect.android.views.AudioButton.AudioHandler;
-import org.odk.collect.android.views.ExpandedHeightGridView;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -55,6 +34,27 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.javarosa.core.model.SelectChoice;
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.SelectMultiData;
+import org.javarosa.core.model.data.helper.Selection;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.ReferenceManager;
+import org.javarosa.form.api.FormEntryCaption;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.javarosa.xpath.expr.XPathFuncExpr;
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.external.ExternalDataUtil;
+import org.odk.collect.android.external.ExternalSelectChoice;
+import org.odk.collect.android.utilities.FileUtils;
+import org.odk.collect.android.views.AudioButton;
+import org.odk.collect.android.views.ExpandedHeightGridView;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * GridWidget handles multiple selection fields using a grid of icons. The user clicks the desired
@@ -90,7 +90,7 @@ public class GridMultiWidget extends QuestionWidget {
 
     // The image views for each of the icons
     View[] imageViews;
-    AudioHandler[] audioHandlers;
+    AudioButton.AudioHandler[] audioHandlers;
 
     // need to remember the last click position for audio treatment
     int lastClickPosition = 0;
@@ -117,7 +117,7 @@ public class GridMultiWidget extends QuestionWidget {
         choices = new String[mItems.size()];
         gridview = new ExpandedHeightGridView(context);
         imageViews = new View[mItems.size()];
-        audioHandlers = new AudioHandler[mItems.size()];
+        audioHandlers = new AudioButton.AudioHandler[mItems.size()];
         // The max width of an icon in a given column. Used to line
         // up the columns and automatically fit the columns in when
         // they are chosen automatically
@@ -155,7 +155,7 @@ public class GridMultiWidget extends QuestionWidget {
             String audioURI =
                     prompt.getSpecialFormSelectChoiceText(sc, FormEntryCaption.TEXT_FORM_AUDIO);
             if (audioURI != null) {
-                audioHandlers[i] = new AudioHandler(prompt.getIndex(), sc.getValue(), audioURI, mPlayer);
+                audioHandlers[i] = new AudioButton.AudioHandler(prompt.getIndex(), sc.getValue(), audioURI, mPlayer);
             } else {
                 audioHandlers[i] = null;
             }
@@ -384,6 +384,17 @@ public class GridMultiWidget extends QuestionWidget {
 
     }
 
+    @Override
+    public void setOnLongClickListener(OnLongClickListener l) {
+        gridview.setOnLongClickListener(l);
+    }
+
+    @Override
+    public void cancelLongPress() {
+        super.cancelLongPress();
+        gridview.cancelLongPress();
+    }
+
     // Custom image adapter. Most of the code is copied from
     // media layout for using a picture.
     private class ImageAdapter extends BaseAdapter {
@@ -418,18 +429,5 @@ public class GridMultiWidget extends QuestionWidget {
                 return convertView;
             }
         }
-    }
-
-
-    @Override
-    public void setOnLongClickListener(OnLongClickListener l) {
-        gridview.setOnLongClickListener(l);
-    }
-
-
-    @Override
-    public void cancelLongPress() {
-        super.cancelLongPress();
-        gridview.cancelLongPress();
     }
 }

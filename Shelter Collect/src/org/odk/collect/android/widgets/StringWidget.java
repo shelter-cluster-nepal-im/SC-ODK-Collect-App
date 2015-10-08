@@ -14,11 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.core.model.data.StringData;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.application.Collect;
-
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -32,6 +27,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TableLayout;
 
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.core.model.data.StringData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.application.Collect;
+
 /**
  * The most basic widget that allows for entry of any text.
  *
@@ -40,9 +40,8 @@ import android.widget.TableLayout;
  */
 public class StringWidget extends QuestionWidget {
     private static final String ROWS = "rows";
-
-    boolean mReadOnly = false;
     protected EditText mAnswer;
+    boolean mReadOnly = false;
 
     public StringWidget(Context context, FormEntryPrompt prompt, boolean readOnlyOverride) {
         this(context, prompt, readOnlyOverride, true);
@@ -52,7 +51,7 @@ public class StringWidget extends QuestionWidget {
     protected StringWidget(Context context, FormEntryPrompt prompt, boolean readOnlyOverride, boolean derived) {
         super(context, prompt);
         mAnswer = new EditText(context);
-        mAnswer.setId(QuestionWidget.newUniqueId());
+        mAnswer.setId(newUniqueId());
         mReadOnly = prompt.isReadOnly() || readOnlyOverride;
 
         mAnswer.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);

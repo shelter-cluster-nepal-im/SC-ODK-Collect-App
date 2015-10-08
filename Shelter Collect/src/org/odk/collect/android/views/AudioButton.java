@@ -14,15 +14,6 @@
 
 package org.odk.collect.android.views;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.javarosa.core.model.FormIndex;
-import org.javarosa.core.reference.InvalidReferenceException;
-import org.javarosa.core.reference.ReferenceManager;
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,12 +22,35 @@ import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import org.javarosa.core.model.FormIndex;
+import org.javarosa.core.reference.InvalidReferenceException;
+import org.javarosa.core.reference.ReferenceManager;
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+
+import java.io.File;
+import java.io.IOException;
+
 /**
  * @author ctsims
  * @author carlhartung
  */
 public class AudioButton extends ImageButton {
     private final static String t = "AudioButton";
+    AudioHandler handler;
+
+    public AudioButton(Context context, FormIndex index, String selectionDesignator, String URI, MediaPlayer player) {
+        super(context);
+        handler = new AudioHandler(index, selectionDesignator, URI, player);
+        Bitmap b =
+                BitmapFactory.decodeResource(context.getResources(),
+                        android.R.drawable.ic_lock_silent_mode_off);
+        this.setImageBitmap(b);
+    }
+
+    public void playAudio() {
+        handler.playAudio(getContext());
+    }
 
     /**
      * Useful class for handling the playing and stopping of audio prompts.
@@ -98,20 +112,5 @@ public class AudioButton extends ImageButton {
             }
 
         }
-    }
-
-    AudioHandler handler;
-
-    public AudioButton(Context context, FormIndex index, String selectionDesignator, String URI, MediaPlayer player) {
-        super(context);
-        handler = new AudioHandler(index, selectionDesignator, URI, player);
-        Bitmap b =
-                BitmapFactory.decodeResource(context.getResources(),
-                        android.R.drawable.ic_lock_silent_mode_off);
-        this.setImageBitmap(b);
-    }
-
-    public void playAudio() {
-        handler.playAudio(getContext());
     }
 }

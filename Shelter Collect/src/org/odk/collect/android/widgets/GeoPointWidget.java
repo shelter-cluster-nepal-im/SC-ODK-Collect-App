@@ -14,7 +14,16 @@
 
 package org.odk.collect.android.widgets;
 
-import java.text.DecimalFormat;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.TableLayout;
+import android.widget.TextView;
 
 import org.javarosa.core.model.data.GeoPointData;
 import org.javarosa.core.model.data.IAnswerData;
@@ -27,17 +36,7 @@ import org.odk.collect.android.activities.GeoPointMapActivitySdk7;
 import org.odk.collect.android.application.Collect;
 import org.odk.collect.android.utilities.CompatibilityUtils;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TextView;
+import java.text.DecimalFormat;
 
 /**
  * GeoPointWidget is the widget that allows the user to get GPS readings.
@@ -51,14 +50,12 @@ public class GeoPointWidget extends QuestionWidget implements IBinaryWidget {
     public static final String READ_ONLY = "readOnly";
 
     public static final double DEFAULT_LOCATION_ACCURACY = 5.0;
-
-    private Button mGetLocationButton;
-    private Button mViewButton;
-
-    private TextView mStringAnswer;
-    private TextView mAnswerDisplay;
     private final boolean mReadOnly;
     private final boolean mUseMapsV2;
+    private Button mGetLocationButton;
+    private Button mViewButton;
+    private TextView mStringAnswer;
+    private TextView mAnswerDisplay;
     private boolean mUseMaps;
     private String mAppearance;
     private double mAccuracyThreshold;
@@ -95,11 +92,11 @@ public class GeoPointWidget extends QuestionWidget implements IBinaryWidget {
             // if we are using mapsV2, we are using maps...
             mUseMaps = true;
         } else if (requestMaps) {
-            // using the legacy maps widget... if MapActivity is available
+            // using the legacy maps widget... if MapsActivity is available
             // otherwise just use the plain widget
             try {
                 // do google maps exist on the device
-                Class.forName("com.google.android.maps.MapActivity");
+                Class.forName("com.google.android.maps.MapsActivity");
                 mUseMaps = true;
             } catch (ClassNotFoundException e) {
                 // use the plain geolocation activity
@@ -113,22 +110,22 @@ public class GeoPointWidget extends QuestionWidget implements IBinaryWidget {
         mReadOnly = prompt.isReadOnly();
 
         // assemble the widget...
-        setOrientation(LinearLayout.VERTICAL);
+        setOrientation(VERTICAL);
         TableLayout.LayoutParams params = new TableLayout.LayoutParams();
         params.setMargins(7, 5, 7, 5);
 
         mStringAnswer = new TextView(getContext());
-        mStringAnswer.setId(QuestionWidget.newUniqueId());
+        mStringAnswer.setId(newUniqueId());
 
         mAnswerDisplay = new TextView(getContext());
-        mAnswerDisplay.setId(QuestionWidget.newUniqueId());
+        mAnswerDisplay.setId(newUniqueId());
         mAnswerDisplay
                 .setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mAnswerDisplay.setGravity(Gravity.CENTER);
 
         // setup play button
         mViewButton = new Button(getContext());
-        mViewButton.setId(QuestionWidget.newUniqueId());
+        mViewButton.setId(newUniqueId());
         mViewButton.setText(getContext().getString(R.string.show_location));
         mViewButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mViewButton.setPadding(20, 20, 20, 20);
@@ -168,7 +165,7 @@ public class GeoPointWidget extends QuestionWidget implements IBinaryWidget {
         });
 
         mGetLocationButton = new Button(getContext());
-        mGetLocationButton.setId(QuestionWidget.newUniqueId());
+        mGetLocationButton.setId(newUniqueId());
         mGetLocationButton.setPadding(20, 20, 20, 20);
         mGetLocationButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP,
                 mAnswerFontsize);
@@ -233,9 +230,9 @@ public class GeoPointWidget extends QuestionWidget implements IBinaryWidget {
         // for maps, we show the view button.
         if (mUseMapsV2) {
             // show the GetLocation button
-            mGetLocationButton.setVisibility(View.VISIBLE);
+            mGetLocationButton.setVisibility(VISIBLE);
             // hide the view button
-            mViewButton.setVisibility(View.GONE);
+            mViewButton.setVisibility(GONE);
             if (mReadOnly) {
                 mGetLocationButton.setText(getContext()
                         .getString(R.string.show_location));
@@ -246,9 +243,9 @@ public class GeoPointWidget extends QuestionWidget implements IBinaryWidget {
         } else {
             // if it is read-only, hide the get-location button...
             if (mReadOnly) {
-                mGetLocationButton.setVisibility(View.GONE);
+                mGetLocationButton.setVisibility(GONE);
             } else {
-                mGetLocationButton.setVisibility(View.VISIBLE);
+                mGetLocationButton.setVisibility(VISIBLE);
                 mGetLocationButton.setText(getContext()
                         .getString(dataAvailable ?
                                 R.string.replace_location : R.string.get_location));
@@ -256,10 +253,10 @@ public class GeoPointWidget extends QuestionWidget implements IBinaryWidget {
 
             if (mUseMaps) {
                 // show the view button
-                mViewButton.setVisibility(View.VISIBLE);
+                mViewButton.setVisibility(VISIBLE);
                 mViewButton.setEnabled(dataAvailable);
             } else {
-                mViewButton.setVisibility(View.GONE);
+                mViewButton.setVisibility(GONE);
             }
         }
     }

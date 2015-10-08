@@ -1,9 +1,4 @@
-
 package org.odk.collect.android.activities;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.preferences.PreferencesActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -23,6 +18,10 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.preferences.PreferencesActivity;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,12 +29,10 @@ import java.io.IOException;
 
 public class SplashScreenActivity extends Activity {
 
+    private static final boolean EXIT = true;
     private int mImageMaxWidth;
     private int mSplashTimeout = 2000; // milliseconds
-
     private AlertDialog mAlertDialog;
-    private static final boolean EXIT = true;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

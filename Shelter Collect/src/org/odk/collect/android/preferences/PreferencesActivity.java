@@ -14,14 +14,6 @@
 
 package org.odk.collect.android.preferences;
 
-import java.util.ArrayList;
-
-import org.javarosa.core.services.IPropertyManager;
-import org.odk.collect.android.R;
-import org.odk.collect.android.logic.FormController;
-import org.odk.collect.android.logic.PropertyManager;
-import org.odk.collect.android.utilities.MediaUtils;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.AlertDialog;
@@ -45,6 +37,14 @@ import android.provider.MediaStore.Images;
 import android.text.InputFilter;
 import android.text.Spanned;
 
+import org.javarosa.core.services.IPropertyManager;
+import org.odk.collect.android.R;
+import org.odk.collect.android.logic.FormController;
+import org.odk.collect.android.logic.PropertyManager;
+import org.odk.collect.android.utilities.MediaUtils;
+
+import java.util.ArrayList;
+
 /**
  * Handles general preferences.
  *
@@ -54,8 +54,6 @@ import android.text.Spanned;
 public class PreferencesActivity extends PreferenceActivity implements OnPreferenceChangeListener {
 
     public static final String INTENT_KEY_ADMIN_MODE = "adminMode";
-    protected static final int IMAGE_CHOOSER = 0;
-
     // PUT ALL PREFERENCE KEYS HERE
     public static final String KEY_INFO = "info";
     public static final String KEY_LAST_VERSION = "lastVersion";
@@ -64,63 +62,47 @@ public class PreferencesActivity extends PreferenceActivity implements OnPrefere
     public static final String KEY_SPLASH_PATH = "splashPath";
     public static final String KEY_FONT_SIZE = "font_size";
     public static final String KEY_DELETE_AFTER_SEND = "delete_send";
-
     public static final String KEY_PROTOCOL = "protocol";
     public static final String KEY_PROTOCOL_SETTINGS = "protocol_settings";
-
     // leaving these in the main screen because username can be used as a
     // pre-fill
     // value in a form
     public static final String KEY_SELECTED_GOOGLE_ACCOUNT = "selected_google_account";
     public static final String KEY_USERNAME = "username";
     public static final String KEY_PASSWORD = "password";
-
     // AGGREGATE SPECIFIC
     public static final String KEY_SERVER_URL = "server_url";
-
     // GME SPECIFIC
     public static final String KEY_GME_PROJECT_ID = "gme_project_id";
     public static final String KEY_GME_ID_HASHMAP = "gme_id_hashmap";
-
     // OTHER SPECIFIC
     public static final String KEY_FORMLIST_URL = "formlist_url";
     public static final String KEY_SUBMISSION_URL = "submission_url";
-
     public static final String NAVIGATION_SWIPE = "swipe";
     public static final String NAVIGATION_BUTTONS = "buttons";
     public static final String NAVIGATION_SWIPE_BUTTONS = "swipe_buttons";
-
     public static final String CONSTRAINT_BEHAVIOR_ON_SWIPE = "on_swipe";
     public static final String CONSTRAINT_BEHAVIOR_ON_FINALIZE = "on_finalize";
     public static final String CONSTRAINT_BEHAVIOR_DEFAULT = "on_swipe";
-
     public static final String KEY_COMPLETED_DEFAULT = "default_completed";
-
     public static final String KEY_HIGH_RESOLUTION = "high_resolution";
-
     public static final String KEY_AUTH = "auth";
-
     public static final String KEY_AUTOSEND_WIFI = "autosend_wifi";
     public static final String KEY_AUTOSEND_NETWORK = "autosend_network";
-
     public static final String KEY_NAVIGATION = "navigation";
     public static final String KEY_CONSTRAINT_BEHAVIOR = "constraint_behavior";
-
+    protected static final int IMAGE_CHOOSER = 0;
+    protected EditTextPreference mUsernamePreference;
+    protected EditTextPreference mPasswordPreference;
     private PreferenceScreen mSplashPathPreference;
-
     private ListPreference mSelectedGoogleAccountPreference;
     private ListPreference mFontSizePreference;
     private ListPreference mNavigationPreference;
     private ListPreference mConstraintBehaviorPreference;
-
     private CheckBoxPreference mAutosendWifiPreference;
     private CheckBoxPreference mAutosendNetworkPreference;
     private ListPreference mProtocolPreference;
-
     private PreferenceScreen mProtocolSettings;
-
-    protected EditTextPreference mUsernamePreference;
-    protected EditTextPreference mPasswordPreference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

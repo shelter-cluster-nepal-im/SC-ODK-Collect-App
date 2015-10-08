@@ -14,16 +14,6 @@
 
 package org.odk.collect.android.activities;
 
-import java.util.ArrayList;
-
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-import org.odk.collect.android.preferences.PreferencesActivity;
-import org.odk.collect.android.provider.InstanceProviderAPI;
-import org.odk.collect.android.provider.InstanceProviderAPI.InstanceColumns;
-import org.odk.collect.android.receivers.NetworkReceiver;
-import org.odk.collect.android.utilities.CompatibilityUtils;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
@@ -45,6 +35,15 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
+
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
+import org.odk.collect.android.preferences.PreferencesActivity;
+import org.odk.collect.android.provider.InstanceProviderAPI;
+import org.odk.collect.android.receivers.NetworkReceiver;
+import org.odk.collect.android.utilities.CompatibilityUtils;
+
+import java.util.ArrayList;
 
 /**
  * Responsible for displaying all the valid forms in the forms directory. Stores
@@ -77,26 +76,26 @@ public class InstanceUploaderList extends ListActivity implements
 
     public Cursor getUnsentCursor() {
         // get all complete or failed submission instances
-        String selection = InstanceColumns.STATUS + "=? or "
-                + InstanceColumns.STATUS + "=?";
+        String selection = InstanceProviderAPI.InstanceColumns.STATUS + "=? or "
+                + InstanceProviderAPI.InstanceColumns.STATUS + "=?";
         String selectionArgs[] = {InstanceProviderAPI.STATUS_COMPLETE,
                 InstanceProviderAPI.STATUS_SUBMISSION_FAILED};
-        String sortOrder = InstanceColumns.DISPLAY_NAME + " ASC";
-        Cursor c = managedQuery(InstanceColumns.CONTENT_URI, null, selection,
+        String sortOrder = InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " ASC";
+        Cursor c = managedQuery(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, selection,
                 selectionArgs, sortOrder);
         return c;
     }
 
     public Cursor getAllCursor() {
         // get all complete or failed submission instances
-        String selection = InstanceColumns.STATUS + "=? or "
-                + InstanceColumns.STATUS + "=? or " + InstanceColumns.STATUS
+        String selection = InstanceProviderAPI.InstanceColumns.STATUS + "=? or "
+                + InstanceProviderAPI.InstanceColumns.STATUS + "=? or " + InstanceProviderAPI.InstanceColumns.STATUS
                 + "=?";
         String selectionArgs[] = {InstanceProviderAPI.STATUS_COMPLETE,
                 InstanceProviderAPI.STATUS_SUBMISSION_FAILED,
                 InstanceProviderAPI.STATUS_SUBMITTED};
-        String sortOrder = InstanceColumns.DISPLAY_NAME + " ASC";
-        Cursor c = managedQuery(InstanceColumns.CONTENT_URI, null, selection,
+        String sortOrder = InstanceProviderAPI.InstanceColumns.DISPLAY_NAME + " ASC";
+        Cursor c = managedQuery(InstanceProviderAPI.InstanceColumns.CONTENT_URI, null, selection,
                 selectionArgs, sortOrder);
         return c;
     }
@@ -179,8 +178,8 @@ public class InstanceUploaderList extends ListActivity implements
 
         Cursor c = mShowUnsent ? getUnsentCursor() : getAllCursor();
 
-        String[] data = new String[]{InstanceColumns.DISPLAY_NAME,
-                InstanceColumns.DISPLAY_SUBTEXT};
+        String[] data = new String[]{InstanceProviderAPI.InstanceColumns.DISPLAY_NAME,
+                InstanceProviderAPI.InstanceColumns.DISPLAY_SUBTEXT};
         int[] view = new int[]{R.id.text1, R.id.text2};
 
         // render total instance view
@@ -301,7 +300,7 @@ public class InstanceUploaderList extends ListActivity implements
 
         // get row id from db
         Cursor c = (Cursor) getListAdapter().getItem(position);
-        long k = c.getLong(c.getColumnIndex(InstanceColumns._ID));
+        long k = c.getLong(c.getColumnIndex(InstanceProviderAPI.InstanceColumns._ID));
 
         Collect.getInstance().getActivityLogger()
                 .logAction(this, "onListItemClick", Long.toString(k));

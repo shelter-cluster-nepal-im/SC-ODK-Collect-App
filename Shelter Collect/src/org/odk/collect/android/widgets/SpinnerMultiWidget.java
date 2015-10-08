@@ -14,8 +14,14 @@
 
 package org.odk.collect.android.widgets;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.util.TypedValue;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.TextView;
 
 import org.javarosa.core.model.SelectChoice;
 import org.javarosa.core.model.data.IAnswerData;
@@ -26,14 +32,8 @@ import org.javarosa.xpath.expr.XPathFuncExpr;
 import org.odk.collect.android.R;
 import org.odk.collect.android.external.ExternalDataUtil;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.util.TypedValue;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * SpinnerMultiWidget, like SelectMultiWidget handles multiple selection fields using checkboxes,
@@ -93,7 +93,7 @@ public class SpinnerMultiWidget extends QuestionWidget {
 
         selectionText.setText(context.getString(R.string.selected));
         selectionText.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
-        selectionText.setVisibility(View.GONE);
+        selectionText.setVisibility(GONE);
 
         button.setText(context.getString(R.string.select_answer));
         button.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mQuestionFontsize);
@@ -116,7 +116,7 @@ public class SpinnerMultiWidget extends QuestionWidget {
                                             first = false;
                                             selectionText.setText(context.getString(R.string.selected)
                                                     + answer_items[i].toString());
-                                            selectionText.setVisibility(View.VISIBLE);
+                                            selectionText.setVisibility(VISIBLE);
                                         } else {
                                             selectionText.setText(selectionText.getText() + ", "
                                                     + answer_items[i].toString());
@@ -165,7 +165,7 @@ public class SpinnerMultiWidget extends QuestionWidget {
                         first = false;
                         selectionText.setText(context.getString(R.string.selected)
                                 + answer_items[i].toString());
-                        selectionText.setVisibility(View.VISIBLE);
+                        selectionText.setVisibility(VISIBLE);
                     } else {
                         selectionText.setText(selectionText.getText() + ", "
                                 + answer_items[i].toString());
@@ -203,7 +203,7 @@ public class SpinnerMultiWidget extends QuestionWidget {
     @Override
     public void clearAnswer() {
         selectionText.setText(R.string.selected);
-        selectionText.setVisibility(View.GONE);
+        selectionText.setVisibility(GONE);
         for (int i = 0; i < selections.length; i++) {
             selections[i] = false;
         }

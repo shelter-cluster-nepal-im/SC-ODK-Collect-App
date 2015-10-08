@@ -14,12 +14,6 @@
 
 package org.odk.collect.android.widgets;
 
-import org.javarosa.core.model.data.IAnswerData;
-import org.javarosa.form.api.FormEntryPrompt;
-import org.odk.collect.android.R;
-import org.odk.collect.android.application.Collect;
-
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +24,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.Toast;
+
+import org.javarosa.core.model.data.IAnswerData;
+import org.javarosa.form.api.FormEntryPrompt;
+import org.odk.collect.android.R;
+import org.odk.collect.android.application.Collect;
 
 
 /**
@@ -133,7 +132,7 @@ public class ExPrinterWidget extends QuestionWidget implements IBinaryWidget {
 
         // set button formatting
         mLaunchIntentButton = new Button(getContext());
-        mLaunchIntentButton.setId(QuestionWidget.newUniqueId());
+        mLaunchIntentButton.setId(newUniqueId());
         mLaunchIntentButton.setText(buttonText);
         mLaunchIntentButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, mAnswerFontsize);
         mLaunchIntentButton.setPadding(20, 20, 20, 20);
