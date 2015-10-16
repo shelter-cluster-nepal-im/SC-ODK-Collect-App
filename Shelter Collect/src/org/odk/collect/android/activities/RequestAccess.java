@@ -45,6 +45,9 @@ public class RequestAccess extends Activity {
         boolean agencyFlag = false;
         boolean desigFlag = false;
         boolean dropDownFlag = false;
+        String pass = "adsadas";
+        String user = "asdasd";
+        String url = "some_url";
 
         if (!isValidName(fullname.getText().toString().trim())) {
             fullname.setError(Html.fromHtml("<font color='red'>Invalid Full Name!</font>"));
@@ -83,7 +86,7 @@ public class RequestAccess extends Activity {
             map.put("designation", desig.getText().toString().trim());
             map.put("deployment", dropdownValue.trim());
             Post_New_ag_Request m = new Post_New_ag_Request();
-            int resp = m.send_request("http://52.3.170.125:5000/ag_request/", "shelter_cluster", "shelter_cluster!", map);
+            int resp = m.send_request(url, user, pass, map);
             Log.d("GPTest", String.valueOf(resp));
             Toast.makeText(getApplicationContext(),
                     "Thank you, Form Subbmited", Toast.LENGTH_SHORT)
